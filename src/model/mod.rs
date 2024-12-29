@@ -17,24 +17,24 @@ enum ActivityLevel {
 /// Agent details.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename = "agent", rename_all = "camelCase")]
-struct Agent {
+pub struct Agent {
     /// Account ID that is tied to this agent. Only included on your own agent.
     /// >= 1 characters
-    account_id: Option<String>,
+    pub account_id: Option<String>,
     /// Symbol of the agent.
     /// >= 3 characters && <= 14 characters
-    symbol: String,
+    pub symbol: String,
     /// The headquarters of the agent.
     /// >= 1 characters
-    headquarters: String,
+    pub headquarters: String,
     /// The number of credits the agent has available.
     /// Credits can be negative if funds have been overdrawn.
-    credits: i64,
+    pub credits: i64,
     /// The faction the agent started with.
     /// >= 1 characters
-    starting_faction: String,
+    pub starting_faction: String,
     /// How many ships are owned by the agent.
-    ship_count: u64,
+    pub ship_count: u64,
 }
 
 /// The chart of a system or waypoint, which makes the
@@ -118,7 +118,7 @@ struct ConstructionMaterial {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum TradeSymbol {
+pub enum TradeSymbol {
     PreciousStones,
     QuartzSand,
     SiliconCrystals,
@@ -267,31 +267,31 @@ enum TradeSymbol {
 /// Contract details.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename = "contract", rename_all = "camelCase")]
-struct Contract {
+pub struct Contract {
     /// ID of the contract.
     /// >= 1 characters
-    id: String,
+    pub id: String,
     /// The symbol of the faction that this contract is for.
     /// >= 1 characters
-    faction_symbol: String,
+    pub faction_symbol: String,
     /// Type of contract.
     #[serde(rename = "type")]
-    contract_type: ContractType,
+    pub contract_type: ContractType,
     /// The terms to fulfill the contract.
-    terms: ContractTerms,
+    pub terms: ContractTerms,
     /// Whether the contract has been accepted by the agent.
-    accepted: bool,
+    pub accepted: bool,
     /// Whether the contract has been fulfilled.
-    fulfilled: bool,
+    pub fulfilled: bool,
     /// Deprecated in favor of deadline_to_accept.
-    expiration: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub expiration: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
     /// The time at which the contract is no longer available to be accepted.
-    deadline_to_accept: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub deadline_to_accept: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ContractType {
+pub enum ContractType {
     Procurement,
     Transport,
     Shuttle,
@@ -300,57 +300,57 @@ enum ContractType {
 /// The terms to fulfill the contract.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ContractTerms {
+pub struct ContractTerms {
     /// The deadline for the contract.
-    deadline: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub deadline: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
     /// Payments for the contract.
-    payment: ContractPayment,
+    pub payment: ContractPayment,
     /// The cargo that needs to be delivered to fulfill the contract.
-    deliver: Option<Vec<ContractDeliverGood>>,
+    pub deliver: Option<Vec<ContractDeliverGood>>,
 }
 
 /// Payments for the contract.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ContractPayment {
+pub struct ContractPayment {
     /// The amount of credits received up front for accepting the contract.
-    on_accepted: u64,
+    pub on_accepted: u64,
     /// The amount of credits received when the contract is fulfilled.
-    on_fulfilled: u64,
+    pub on_fulfilled: u64,
 }
 
 /// The details of a delivery contract.
 /// Includes the type of good, units needed, and the destination.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ContractDeliverGood {
+pub struct ContractDeliverGood {
     /// The symbol of the trade good to deliver.
     /// >= 1 characters
-    trade_symbol: TradeSymbol,
+    pub trade_symbol: TradeSymbol,
     /// The destination where goods need to be delivered.
     /// >= 1 characters
-    destination_symbol: String,
+    pub destination_symbol: String,
     /// The number of units that need to be delivered on this contract.
-    units_required: u64,
+    pub units_required: u64,
     /// The number of units fulfilled on this contract.
-    units_fulfilled: u64,
+    pub units_fulfilled: u64,
 }
 
 /// A cooldown is a period of time in which a ship cannot perform certain actions.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Cooldown {
+pub struct Cooldown {
     /// The symbol of the ship that is on cooldown.
     /// >= 1 characters
-    ship_symbol: String,
+    pub ship_symbol: String,
     /// The total duration of the cooldown in seconds.
     /// >= 0
-    total_seconds: u64,
+    pub total_seconds: u64,
     /// The remaining duration of the cooldown in seconds.
     /// >= 0
-    remaining_seconds: u64,
+    pub remaining_seconds: u64,
     /// The date and time when the cooldown expires in ISO 8601 format.
-    expiration: Option<String>, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub expiration: Option<String>, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 /// Extraction details.
@@ -378,28 +378,28 @@ struct ExtractionYield {
 /// Faction details.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Faction {
+pub struct Faction {
     /// The symbol of the faction.
-    symbol: FactionSymbol,
+    pub symbol: FactionSymbol,
     /// Name of the faction.
     /// >= 1 characters
-    name: String, // XXX: How does this relate to the faction symbol?
+    pub name: String, // XXX: How does this relate to the faction symbol?
     /// Description of the faction.
     /// >= 1 characters
-    description: String,
+    pub description: String,
     /// The waypoint in which the faction's HQ is located in.
     /// >= 1 characters
-    headquarters: String,
+    pub headquarters: String,
     /// List of traits that define this faction.
-    traits: Vec<FactionTrait>,
+    pub traits: Vec<FactionTrait>,
     /// Whether or not the faction is currently recruiting new agents.
-    is_recruiting: bool,
+    pub is_recruiting: bool,
 }
 
 /// The symbol of the faction.
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum FactionSymbol {
+pub enum FactionSymbol {
     Cosmic,
     Void,
     Galactic,
@@ -423,18 +423,18 @@ enum FactionSymbol {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct FactionTrait {
+pub struct FactionTrait {
     /// The unique identifier of the trait.
-    symbol: FactionTraitSymbol,
+    pub symbol: FactionTraitSymbol,
     /// The name of the trait.
-    name: String,
+    pub name: String,
     /// A description of the trait.
-    description: String,
+    pub description: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum FactionTraitSymbol {
+pub enum FactionTraitSymbol {
     Bureaucratic,
     Secretive,
     Capitalistic,
@@ -744,71 +744,71 @@ struct ScrapTransaction {
 /// Ship details.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Ship {
+pub struct Ship {
     /// The globally unique identifier of the ship
     /// in the following format:
     /// [AGENT_SYMBOL]-[HEX_ID]
-    symbol: String,
+    pub symbol: String,
     /// The public registration information of the ship.
-    registration: ShipRegistration,
+    pub registration: ShipRegistration,
     /// The navigation information of the ship.
-    nav: ShipNav,
+    pub nav: ShipNav,
     /// The ship's crew service and maintain the ship's systems
     /// and equipment.
-    crew: ShipCrew,
+    pub crew: ShipCrew,
     /// The frame of the ship. The frame determines the number
     /// of modules and mounting points of the ship, as well
     /// as base fuel capacity. As the condition of the frame
     /// takes more wear, the ship will become more sluggish
     /// and less maneuverable.
-    frame: ShipFrame,
+    pub frame: ShipFrame,
     /// The reactor of the ship. The reactor is responsible
     /// for powering the ship's systems and weapons.
-    reactor: ShipReactor,
+    pub reactor: ShipReactor,
     /// The engine determines how quickly a ship travels
     /// between waypoints.
-    engine: ShipEngine,
+    pub engine: ShipEngine,
     /// A cooldown is a period of time in which a ship cannot
     /// perform certain actions.
-    cooldown: Cooldown,
+    pub cooldown: Cooldown,
     /// Modules installed on this ship.
-    modules: Vec<ShipModule>,
+    pub modules: Vec<ShipModule>,
     /// Mounts installed in this ship.
-    mounts: Vec<ShipMount>,
+    pub mounts: Vec<ShipMount>,
     /// Ship cargo details.
-    cargo: ShipCargo,
+    pub cargo: ShipCargo,
     /// Details of the ship's fuel tanks including how much
     /// fuel was consumed during the last transit or action.
-    fuel: ShipFuel,
+    pub fuel: ShipFuel,
 }
 
 /// Ship cargo details.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipCargo {
+pub struct ShipCargo {
     /// The max number of items that can be stored in the cargo hold.
     /// >= 0
-    capacity: u64,
+    pub capacity: u64,
     /// The number of items currently stored in the cargo hold.
     /// >= 0
-    units: u64,
+    pub units: u64,
     /// The items currently in the cargo hold.
-    inventory: Vec<ShipCargoItem>,
+    pub inventory: Vec<ShipCargoItem>,
 }
 
 /// The type of cargo item and the number of units.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipCargoItem {
+pub struct ShipCargoItem {
     /// The good's symbol.
-    symbol: TradeSymbol,
+    pub symbol: TradeSymbol,
     /// The name of the cargo item type.
-    name: String,
+    pub name: String,
     /// The description of the cargo item type.
-    description: String,
+    pub description: String,
     /// The number of units of the cargo item.
     /// >= 1
-    units: u64,
+    pub units: u64,
 }
 
 /// The repairable condition of a component.
@@ -818,7 +818,7 @@ struct ShipCargoItem {
 /// is repaired, the overall integrity of the component decreases.
 /// >= 0 && <= 1
 #[derive(Serialize, Deserialize, Debug)]
-struct ShipComponentCondition(f64);
+pub struct ShipComponentCondition(f64);
 
 /// The overall integrity of the component, which determines
 /// the performance of the component. A value of 0 indicates
@@ -828,7 +828,7 @@ struct ShipComponentCondition(f64);
 /// and represents permanent wear over time.
 /// >= 0 && <= 1
 #[derive(Serialize, Deserialize, Debug)]
-struct ShipComponentIntegrity(f64);
+pub struct ShipComponentIntegrity(f64);
 
 /// An event that represents damage or wear to
 /// a ship's reactor, frame, or engine, reducing
@@ -888,30 +888,30 @@ enum ShipComponentType {
 /// ship's systems and equipment.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipCrew {
+pub struct ShipCrew {
     /// The current number of crew members on the ship.
-    current: u64,
+    pub current: u64,
     /// The minimum number of crew members required to maintain the ship.
-    required: u64,
+    pub required: u64,
     /// The maximum number of crew members the ship can support.
-    capacity: u64,
+    pub capacity: u64,
     /// The rotation of crew shifts. A stricter shift improves the
     /// ship's performance. A more relaxed shift improves the crew's morale.
-    rotation: ShiftType,
+    pub rotation: ShiftType,
     /// A rough measure of the crew's morale. A higher morale
     /// means the crew is happier and more productive. A lower
     /// morale means the ship is more prone to accidents.
     /// >= 0 && <= 100
-    morale: u8,
+    pub morale: u8,
     /// The amount of credits per crew member paid per hour.
     /// Wages are paid when a ship docks at a civilized waypoint.
     /// >= 0
-    wages: u64,
+    pub wages: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ShiftType {
+pub enum ShiftType {
     Strict,
     Relaxed,
 }
@@ -920,27 +920,27 @@ enum ShiftType {
 /// between waypoints.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipEngine {
+pub struct ShipEngine {
     /// The symbol of the engine.
-    symbol: EngineType,
+    pub symbol: EngineType,
     /// The name of the engine.
-    name: String,
+    pub name: String,
     /// The description of the engine.
-    description: String,
-    condition: ShipComponentCondition,
-    integrity: ShipComponentIntegrity,
+    pub description: String,
+    pub condition: ShipComponentCondition,
+    pub integrity: ShipComponentIntegrity,
     /// The speed stat of this engine. The higher the speed,
     /// the faster a ship can travel from one point to another.
     /// Reduces the time of arrival when navigating the ship.
     /// >= 1
-    speed: u64,
+    pub speed: u64,
     /// The requirements for installation on a ship.
-    requirements: ShipRequirements,
+    pub requirements: ShipRequirements,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum EngineType {
+pub enum EngineType {
     EngineImpulseDriveI,
     EngineIonDriveI,
     EngineIonDriveIi,
@@ -949,36 +949,36 @@ enum EngineType {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipFrame {
-    symbol: FrameType,
-    name: String,
-    description: String,
-    condition: ShipComponentCondition,
-    integrity: ShipComponentIntegrity,
+pub struct ShipFrame {
+    pub symbol: FrameType,
+    pub name: String,
+    pub description: String,
+    pub condition: ShipComponentCondition,
+    pub integrity: ShipComponentIntegrity,
     /// The amount of slots that can be dedicated to modules
     /// installed in the ship. Each installed module takes up
     /// a number of slots, and once there are no more slots, no
     /// more modules can be installed.
     /// >= 0
-    module_slots: u64,
+    pub module_slots: u64,
     /// The amount of points that can be dedicated to mounts
     /// installed in this ship. Each installed mount takes up
     /// a number of points, and once there are no more points
     /// remaining, no new mounts can be installed.
     /// >= 0
-    mounting_points: u64,
+    pub mounting_points: u64,
     /// The maximum amount of fuel that can be stored in this ship.
     /// When refueling, the ship will be refueled to this amount.
     /// >= 0
-    fuel_capacity: u64,
+    pub fuel_capacity: u64,
     /// The requirements for installation on a ship.
-    requirements: ShipRequirements,
+    pub requirements: ShipRequirements,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[expect(clippy::enum_variant_names)]
-enum FrameType {
+pub enum FrameType {
     FrameProbe,
     FrameDrone,
     FrameInterceptor,
@@ -998,19 +998,19 @@ enum FrameType {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipFuel {
-    current: u64,
-    capacity: u64,
+pub struct ShipFuel {
+    pub current: u64,
+    pub capacity: u64,
     /// An object that only shows up when an action has consumed
     /// fuel in the process. Shows the fuel consumption data.
-    consumed: Option<FuelConsumption>,
+    pub consumed: Option<FuelConsumption>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct FuelConsumption {
-    amount: u64,
-    timestampt: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+pub struct FuelConsumption {
+    pub amount: u64,
+    pub timestampt: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 /// Result of a transaction for a ship modification,
@@ -1030,24 +1030,24 @@ struct ShipModificationTransaction {
 /// quarters for crew. Module installations are permanent.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipModule {
-    symbol: ModuleType,
+pub struct ShipModule {
+    pub symbol: ModuleType,
     /// Modules that provide capacity, such as cargo hold or crew
     /// quarters, will show this value to denote how much of a
     /// bonus the module grants.
-    capacity: Option<u64>,
+    pub capacity: Option<u64>,
     /// Modules that have a range, such as sensor arrays,
     /// will show this value to denote how far the module can reach
     /// with its capabilities.
-    range: Option<u64>,
-    name: String,
-    description: String,
-    requirements: ShipRequirements,
+    pub range: Option<u64>,
+    pub name: String,
+    pub description: String,
+    pub requirements: ShipRequirements,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ModuleType {
+pub enum ModuleType {
     ModuleMineralProcessorI,
     ModuleGasProcessorI,
     ModuleCargoHoldI,
@@ -1072,22 +1072,22 @@ enum ModuleType {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipMount {
-    symbol: MountType,
-    name: String,
-    description: Option<String>,
+pub struct ShipMount {
+    pub symbol: MountType,
+    pub name: String,
+    pub description: Option<String>,
     /// Mounts that have this value, such as mining lasers,
     /// denote how powerful this mount's capabilities are.
-    strength: Option<u64>,
+    pub strength: Option<u64>,
     /// Mounts that have this value denote what goods can
     /// be produced from using this mount.
-    deposits: Option<Vec<DepositType>>,
-    requirements: ShipRequirements,
+    pub deposits: Option<Vec<DepositType>>,
+    pub requirements: ShipRequirements,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum MountType {
+pub enum MountType {
     MountGasSiphonI,
     MountGasSiphonIi,
     MountGasSiphonIii,
@@ -1107,7 +1107,7 @@ enum MountType {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum DepositType {
+pub enum DepositType {
     QuartzSand,
     SiliconCrystals,
     PreciousStones,
@@ -1127,19 +1127,19 @@ enum DepositType {
 /// The navigation information of the ship.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipNav {
-    system_symbol: String,
-    waypoint_symbol: String,
+pub struct ShipNav {
+    pub system_symbol: String,
+    pub waypoint_symbol: String,
     /// The routing information for the ship's most
     /// recent transit or current location.
-    route: ShipNavRoute,
-    status: ShipNavStatus,
-    flight_mode: ShipNavFlightMode,
+    pub route: ShipNavRoute,
+    pub status: ShipNavStatus,
+    pub flight_mode: ShipNavFlightMode,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ShipNavFlightMode {
+pub enum ShipNavFlightMode {
     Drift,
     Stealth,
     Cruise,
@@ -1148,27 +1148,27 @@ enum ShipNavFlightMode {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipNavRoute {
-    destination: ShipNavRouteWaypoint,
-    origin: ShipNavRouteWaypoint,
-    departure_time: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
-    arrival: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+pub struct ShipNavRoute {
+    pub destination: ShipNavRouteWaypoint,
+    pub origin: ShipNavRouteWaypoint,
+    pub departure_time: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub arrival: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipNavRouteWaypoint {
-    symbol: String,
+pub struct ShipNavRouteWaypoint {
+    pub symbol: String,
     #[serde(rename = "type")]
-    waypoint_type: WaypointType,
-    system_symbol: String,
-    x: u64,
-    y: u64,
+    pub waypoint_type: WaypointType,
+    pub system_symbol: String,
+    pub x: u64,
+    pub y: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ShipNavStatus {
+pub enum ShipNavStatus {
     InTransit,
     InOrbit,
     Docked,
@@ -1176,23 +1176,23 @@ enum ShipNavStatus {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipReactor {
-    symbol: ReactorType,
-    name: String,
-    description: String,
-    condition: ShipComponentCondition,
-    integrity: ShipComponentIntegrity,
+pub struct ShipReactor {
+    pub symbol: ReactorType,
+    pub name: String,
+    pub description: String,
+    pub condition: ShipComponentCondition,
+    pub integrity: ShipComponentIntegrity,
     /// The amount of power provided by this reactor.
     /// The more power a reactor provides to the ship,
     /// the lower the cooldown it gets when using a module
     /// or mount that taxes the ship's power.
-    power_output: u64,
-    requirements: ShipRequirements,
+    pub power_output: u64,
+    pub requirements: ShipRequirements,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ReactorType {
+pub enum ReactorType {
     ReactorSolarI,
     ReactorFusionI,
     ReactorFissionI,
@@ -1202,24 +1202,24 @@ enum ReactorType {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipRegistration {
-    name: String,
-    faction_symbol: FactionSymbol,
+pub struct ShipRegistration {
+    pub name: String,
+    pub faction_symbol: FactionSymbol,
     /// The registered role of the ship.
-    role: ShipRole,
+    pub role: ShipRole,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipRequirements {
-    power: Option<u64>,
-    crew: Option<u64>,
-    slots: Option<u64>,
+pub struct ShipRequirements {
+    pub power: Option<u64>,
+    pub crew: Option<u64>,
+    pub slots: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ShipRole {
+pub enum ShipRole {
     Fabricator,
     Harvester,
     Hauler,
@@ -1529,7 +1529,7 @@ enum WaypointTraitSymbol {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum WaypointType {
+pub enum WaypointType {
     Planet,
     GasGiant,
     Moon,
@@ -1609,4 +1609,34 @@ struct Announcement {
 struct Link {
     name: String,
     url: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct RegisterAgent {
+    pub faction: FactionSymbol,
+    pub symbol: String,
+    pub email: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ApiResponse {
+    pub data: ApiResponseData,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum ApiResponseData {
+    RegisterAgentSuccess(RegisterAgentSuccess),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct RegisterAgentSuccess {
+    pub agent: Agent,
+    pub contract: Contract,
+    pub faction: Faction,
+    pub ship: Ship,
+    pub token: String,
 }
