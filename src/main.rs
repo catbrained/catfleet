@@ -16,7 +16,7 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let client = client::Client::new();
+    let mut client = client::Client::new();
 
     let status = client.get_status().await;
 
