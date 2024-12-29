@@ -844,6 +844,46 @@ struct ShipConditionEvent {
     description: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum ShipConditionEventType {
+    ReactorOverload,
+    EnergySpikeFromMineral,
+    SolarFlareInterference,
+    CoolantLeak,
+    PowerDistributionFluctuation,
+    MagneticFieldDisruption,
+    HullMicrometeoriteStrikes,
+    StructuralStressFractures,
+    CorrosiveMineralContamination,
+    ThermalExpansionMismatch,
+    VibrationDamageFromDrilling,
+    ElectromagneticFieldInterference,
+    ImpactWithExtractedDebris,
+    FuelEfficiencyDegradation,
+    CoolantSystemAgeing,
+    DustMicroabrasions,
+    ThrusterNozzleWear,
+    ExhaustPortClogging,
+    BearingLubricationFade,
+    SensorCalibrationDrift,
+    HullMicrometeoriteDamage,
+    SpaceDebrisCollision,
+    ThermalStress,
+    VibrationOverload,
+    PressureDifferentialStress,
+    ElectromagneticSurgeEffects,
+    AtmosphericEntryHeat,
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum ShipComponentType {
+    Frame,
+    Reactor,
+    Engine,
+}
+
 /// The ship's crew service and maintain the
 /// ship's systems and equipment.
 #[derive(Serialize, Deserialize, Debug)]
@@ -869,6 +909,13 @@ struct ShipCrew {
     wages: u64,
 }
 
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum ShiftType {
+    Strict,
+    Relaxed,
+}
+
 /// The engine determines how quickly a ship travels
 /// between waypoints.
 #[derive(Serialize, Deserialize, Debug)]
@@ -889,6 +936,15 @@ struct ShipEngine {
     speed: u64,
     /// The requirements for installation on a ship.
     requirements: ShipRequirements,
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum EngineType {
+    EngineImpulseDriveI,
+    EngineIonDriveI,
+    EngineIonDriveIi,
+    EngineHyperDriveI,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -919,6 +975,27 @@ struct ShipFrame {
     requirements: ShipRequirements,
 }
 
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[expect(clippy::enum_variant_names)]
+enum FrameType {
+    FrameProbe,
+    FrameDrone,
+    FrameInterceptor,
+    FrameRacer,
+    FrameFighter,
+    FrameFrigate,
+    FrameShuttle,
+    FrameExplorer,
+    FrameMiner,
+    FrameLightFreighter,
+    FrameHeavyFrighter,
+    FrameTransport,
+    FrameDestroyer,
+    FrameCruiser,
+    FrameCarrier,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct ShipFuel {
@@ -927,6 +1004,13 @@ struct ShipFuel {
     /// An object that only shows up when an action has consumed
     /// fuel in the process. Shows the fuel consumption data.
     consumed: Option<FuelConsumption>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct FuelConsumption {
+    amount: u64,
+    timestampt: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 /// Result of a transaction for a ship modification,
@@ -961,6 +1045,31 @@ struct ShipModule {
     requirements: ShipRequirements,
 }
 
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum ModuleType {
+    ModuleMineralProcessorI,
+    ModuleGasProcessorI,
+    ModuleCargoHoldI,
+    ModuleCargoHoldIi,
+    ModuleCargoHoldIii,
+    ModuleCrewQuartersI,
+    ModuleEnvoyQuartersI,
+    ModulePassengerCabinI,
+    ModuleMicroRefineryI,
+    ModuleOreRefineryI,
+    ModuleFuelRefineryI,
+    ModuleScienceLabI,
+    ModuleJumpDriveI,
+    ModuleJumpDriveIi,
+    ModuleJumpDriveIii,
+    ModuleWarpDriveI,
+    ModuleWarpDriveIi,
+    ModuleWarpDriveIii,
+    ModuleShieldGeneratorI,
+    ModuleShieldGeneratorIi,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct ShipMount {
@@ -974,6 +1083,45 @@ struct ShipMount {
     /// be produced from using this mount.
     deposits: Option<Vec<DepositType>>,
     requirements: ShipRequirements,
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum MountType {
+    MountGasSiphonI,
+    MountGasSiphonIi,
+    MountGasSiphonIii,
+    MountSurveyorI,
+    MountSurveyorIi,
+    MountSurveyorIii,
+    MountSensorArrayI,
+    MountSensorArrayIi,
+    MountSensorArrayIii,
+    MountMiningLaserI,
+    MountMiningLaserIi,
+    MountMiningLaserIii,
+    MountLaserCannonI,
+    MountMissileLauncherI,
+    MountTurretI,
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum DepositType {
+    QuartzSand,
+    SiliconCrystals,
+    PreciousStones,
+    IceWater,
+    AmmoniaIce,
+    IronOre,
+    CopperOre,
+    SilverOre,
+    AluminumOre,
+    GoldOre,
+    PlatinumOre,
+    Diamonds,
+    UraniteOre,
+    MeritiumOre,
 }
 
 /// The navigation information of the ship.
@@ -1042,6 +1190,16 @@ struct ShipReactor {
     requirements: ShipRequirements,
 }
 
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum ReactorType {
+    ReactorSolarI,
+    ReactorFusionI,
+    ReactorFissionI,
+    ReactorChemicalI,
+    ReactorAntimatterI,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct ShipRegistration {
@@ -1080,6 +1238,7 @@ enum ShipRole {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[expect(clippy::enum_variant_names)]
 enum ShipType {
     ShipProbe,
     ShipMiningDrone,
@@ -1167,6 +1326,14 @@ struct Survey {
     deposits: Vec<SurveyDeposit>,
     expiration: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
     size: DepositSize,
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum DepositSize {
+    Small,
+    Moderate,
+    Large,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -1377,4 +1544,69 @@ enum WaypointType {
     GravityWell,
     ArtificialGravityWell,
     FuelStation,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ApiStatus {
+    status: String,
+    version: String,
+    reset_date: String,
+    description: String,
+    stats: GameStats,
+    leaderboards: Leaderboards,
+    server_resets: ServerResets,
+    announcements: Vec<Announcement>,
+    links: Vec<Link>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct GameStats {
+    agents: u64,
+    ships: u64,
+    systems: u64,
+    waypoints: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct Leaderboards {
+    most_credits: Vec<LeaderboardAgentCredits>,
+    most_submitted_charts: Vec<LeaderboardAgentCharts>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct LeaderboardAgentCredits {
+    agent_symbol: String,
+    credits: i64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct LeaderboardAgentCharts {
+    agent_symbol: String,
+    chart_count: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct ServerResets {
+    next: String,
+    frequency: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct Announcement {
+    title: String,
+    body: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct Link {
+    name: String,
+    url: String,
 }
