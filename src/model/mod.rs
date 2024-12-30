@@ -1644,6 +1644,7 @@ pub enum ApiResponseData {
     GetConstructionSite(Construction),
     ListAgents(Vec<Agent>),
     ListFactions(Vec<Faction>),
+    ListSystems(Vec<System>),
 }
 
 #[derive(Serialize, Deserialize, Debug)]

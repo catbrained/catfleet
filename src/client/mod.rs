@@ -375,4 +375,31 @@ impl Client {
             },
         }
     }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn list_systems(
+        &mut self,
+        limit: Option<u64>,
+        page: Option<u64>,
+    ) -> Result<(Vec<System>, Meta), anyhow::Error> {
+        let limit = limit.unwrap_or(10);
+        let page = page.unwrap_or(1);
+
+        let url = self
+            .base_url
+            .join(&format!("systems?limit={limit}&page={page}"))
+            .map_err(anyhow::Error::new)?;
+
+        let req = Request::new(Method::GET, url);
+
+        let res = self.client.ready().await?.call(req).await?;
+
+        match res.json::<ApiResponse>().await {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponse { data, meta }) => match data {
+                ApiResponseData::ListSystems(systems) => Ok((systems, meta)),
+                _ => Err(anyhow!("Unexpected response data: {data:?}")),
+            },
+        }
+    }
 }
