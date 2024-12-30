@@ -93,26 +93,26 @@ pub enum SystemType {
 /// The construction details of a waypoint.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename = "construction", rename_all = "camelCase")]
-struct Construction {
+pub struct Construction {
     /// The symbol of the waypoint.
-    symbol: String,
+    pub symbol: String,
     /// The materials required to construct the waypoint.
-    materials: Vec<ConstructionMaterial>,
+    pub materials: Vec<ConstructionMaterial>,
     /// Wether the waypoint has been constructed.
-    is_complete: bool,
+    pub is_complete: bool,
 }
 
 /// The details of the required construction materials
 /// for a given waypoint under construction.
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "camelCase")]
-struct ConstructionMaterial {
+pub struct ConstructionMaterial {
     /// The good's symbol.
-    trade_symbol: TradeSymbol,
+    pub trade_symbol: TradeSymbol,
     /// The number of units required.
-    required: u64,
+    pub required: u64,
     /// The number of units fullfilled toward the required amount.
-    fulfilled: u64,
+    pub fulfilled: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
@@ -1640,6 +1640,7 @@ pub enum ApiResponseData {
     GetMarket(Market),
     GetShipyard(Shipyard),
     GetJumpGate(JumpGate),
+    GetConstructionSite(Construction),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
