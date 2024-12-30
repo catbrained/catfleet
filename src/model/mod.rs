@@ -1643,6 +1643,7 @@ pub enum ApiResponseData {
     GetJumpGate(JumpGate),
     GetConstructionSite(Construction),
     ListAgents(Vec<Agent>),
+    ListFactions(Vec<Faction>),
 }
 
 #[derive(Serialize, Deserialize, Debug)]

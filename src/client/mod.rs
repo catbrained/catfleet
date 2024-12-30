@@ -13,8 +13,8 @@ use tower::{Layer, Service, ServiceExt};
 use tracing::{instrument, Level};
 
 use crate::model::{
-    Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, FactionSymbol, JumpGate, Market,
-    Meta, RegisterAgent, RegisterAgentSuccess, Shipyard, System, Waypoint,
+    Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Faction, FactionSymbol, JumpGate,
+    Market, Meta, RegisterAgent, RegisterAgentSuccess, Shipyard, System, Waypoint,
 };
 
 mod limit;
@@ -344,6 +344,33 @@ impl Client {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponse { data, meta }) => match data {
                 ApiResponseData::ListAgents(agents) => Ok((agents, meta)),
+                _ => Err(anyhow!("Unexpected response data: {data:?}")),
+            },
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn list_factions(
+        &mut self,
+        limit: Option<u64>,
+        page: Option<u64>,
+    ) -> Result<(Vec<Faction>, Meta), anyhow::Error> {
+        let limit = limit.unwrap_or(10);
+        let page = page.unwrap_or(1);
+
+        let url = self
+            .base_url
+            .join(&format!("factions?limit={limit}&page={page}"))
+            .map_err(anyhow::Error::new)?;
+
+        let req = Request::new(Method::GET, url);
+
+        let res = self.client.ready().await?.call(req).await?;
+
+        match res.json::<ApiResponse>().await {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponse { data, meta }) => match data {
+                ApiResponseData::ListFactions(factions) => Ok((factions, meta)),
                 _ => Err(anyhow!("Unexpected response data: {data:?}")),
             },
         }
