@@ -102,7 +102,7 @@ impl Client {
         faction: FactionSymbol,
         agent_name: String,
         email: Option<String>,
-    ) -> Result<RegisterAgentSuccess, anyhow::Error> {
+    ) -> Result<Box<RegisterAgentSuccess>, anyhow::Error> {
         if !(3..=14).contains(&agent_name.len()) {
             return Err(anyhow!(
                 "Agent name must be between 3 and 14 characters long"
