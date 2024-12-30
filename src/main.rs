@@ -1,3 +1,4 @@
+use tracing::{event, Level};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 mod client;
@@ -18,7 +19,8 @@ async fn main() {
 
     let mut client = client::Client::new();
 
-    let status = client.get_status().await;
-
-    println!("{:?}", status);
+    match client.get_status().await {
+        Ok(status) => event!(Level::INFO, status.status),
+        Err(e) => event!(Level::ERROR, %e),
+    }
 }

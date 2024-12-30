@@ -4,28 +4,30 @@ use std::{
 };
 
 use anyhow::anyhow;
+use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
 use reqwest::{
     header::{self, HeaderValue},
     Method, Request, StatusCode, Url,
 };
-use tower::{
-    limit::{RateLimit, RateLimitLayer},
-    Layer, Service, ServiceExt,
-};
+use tower::{Layer, Service, ServiceExt};
 use tracing::{instrument, Level};
 
 use crate::model::{
     ApiResponse, ApiResponseData, ApiStatus, FactionSymbol, RegisterAgent, RegisterAgentSuccess,
 };
 
-const RATELIMIT_REQUESTS: u64 = 2;
-const RATELIMIT_DURATION: Duration = Duration::from_secs(1);
+mod limit;
+
+const RATELIMIT_REQUESTS_DEFAULT: u64 = 2;
+const RATELIMIT_DURATION_DEFAULT: Duration = Duration::from_secs(1);
+const RATELIMIT_REQUESTS_BURST: u64 = 30;
+const RATELIMIT_DURATION_BURST: Duration = Duration::from_secs(60);
 
 #[derive(Debug)]
-struct InnerClient(RateLimit<reqwest::Client>);
+struct InnerClient(RateLimitWithBurst<reqwest::Client>);
 
 impl Deref for InnerClient {
-    type Target = RateLimit<reqwest::Client>;
+    type Target = RateLimitWithBurst<reqwest::Client>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -48,7 +50,12 @@ impl Client {
     #[instrument(level = Level::TRACE)]
     pub fn new() -> Self {
         let client = reqwest::Client::new();
-        let rate_limit = RateLimitLayer::new(RATELIMIT_REQUESTS, RATELIMIT_DURATION);
+        let rate_limit = RateLimitWithBurstLayer::new(
+            RATELIMIT_REQUESTS_DEFAULT,
+            RATELIMIT_DURATION_DEFAULT,
+            RATELIMIT_REQUESTS_BURST,
+            RATELIMIT_DURATION_BURST,
+        );
 
         let client = InnerClient(rate_limit.layer(client));
 
@@ -63,7 +70,12 @@ impl Client {
     #[instrument(level = Level::TRACE)]
     pub fn new_with_url(url: &str) -> Result<Self, anyhow::Error> {
         let client = reqwest::Client::new();
-        let rate_limit = RateLimitLayer::new(RATELIMIT_REQUESTS, RATELIMIT_DURATION);
+        let rate_limit = RateLimitWithBurstLayer::new(
+            RATELIMIT_REQUESTS_DEFAULT,
+            RATELIMIT_DURATION_DEFAULT,
+            RATELIMIT_REQUESTS_BURST,
+            RATELIMIT_DURATION_BURST,
+        );
 
         let client = InnerClient(rate_limit.layer(client));
 

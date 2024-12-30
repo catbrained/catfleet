@@ -1549,66 +1549,66 @@ pub enum WaypointType {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiStatus {
-    status: String,
-    version: String,
-    reset_date: String,
-    description: String,
-    stats: GameStats,
-    leaderboards: Leaderboards,
-    server_resets: ServerResets,
-    announcements: Vec<Announcement>,
-    links: Vec<Link>,
+    pub status: String,
+    pub version: String,
+    pub reset_date: String,
+    pub description: String,
+    pub stats: GameStats,
+    pub leaderboards: Leaderboards,
+    pub server_resets: ServerResets,
+    pub announcements: Vec<Announcement>,
+    pub links: Vec<Link>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct GameStats {
-    agents: u64,
-    ships: u64,
-    systems: u64,
-    waypoints: u64,
+pub struct GameStats {
+    pub agents: u64,
+    pub ships: u64,
+    pub systems: u64,
+    pub waypoints: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Leaderboards {
-    most_credits: Vec<LeaderboardAgentCredits>,
-    most_submitted_charts: Vec<LeaderboardAgentCharts>,
+pub struct Leaderboards {
+    pub most_credits: Vec<LeaderboardAgentCredits>,
+    pub most_submitted_charts: Vec<LeaderboardAgentCharts>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct LeaderboardAgentCredits {
-    agent_symbol: String,
-    credits: i64,
+pub struct LeaderboardAgentCredits {
+    pub agent_symbol: String,
+    pub credits: i64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct LeaderboardAgentCharts {
-    agent_symbol: String,
-    chart_count: u64,
+pub struct LeaderboardAgentCharts {
+    pub agent_symbol: String,
+    pub chart_count: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ServerResets {
-    next: String,
-    frequency: String,
+pub struct ServerResets {
+    pub next: String,
+    pub frequency: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Announcement {
-    title: String,
-    body: String,
+pub struct Announcement {
+    pub title: String,
+    pub body: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Link {
-    name: String,
-    url: String,
+pub struct Link {
+    pub name: String,
+    pub url: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
