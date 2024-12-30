@@ -1254,10 +1254,16 @@ pub enum ShipType {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct ShipTypeListItem {
+    #[serde(rename = "type")]
+    pub ship_type: ShipType,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Shipyard {
     pub symbol: String,
-    pub ship_types: Vec<ShipType>,
+    pub ship_types: Vec<ShipTypeListItem>,
     pub transactions: Option<Vec<ShipyardTransaction>>,
     pub ships: Option<Vec<ShipyardShip>>,
     /// The fee to modify a ship at this shipyard.
