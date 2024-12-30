@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 
 /// The activity level of a trade good.
@@ -1532,6 +1534,84 @@ pub enum WaypointTraitSymbol {
     Stripped,
 }
 
+impl Display for WaypointTraitSymbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let res = match self {
+            WaypointTraitSymbol::Uncharted => "UNCHARTED",
+            WaypointTraitSymbol::UnderConstruction => "UNDER_CONSTRUCTION",
+            WaypointTraitSymbol::Marketplace => "MARKETPLACE",
+            WaypointTraitSymbol::Shipyard => "SHIPYARD",
+            WaypointTraitSymbol::Outpost => "OUTPOST",
+            WaypointTraitSymbol::ScatteredSettlements => "SCATTERED_SETTLEMENTS",
+            WaypointTraitSymbol::SprawlingCities => "SPRAWLING_CITIES",
+            WaypointTraitSymbol::MegaStructures => "MEGA_STRUCTURES",
+            WaypointTraitSymbol::PirateBase => "PIRATE_BASE",
+            WaypointTraitSymbol::Overcrowded => "OVERCROWDED",
+            WaypointTraitSymbol::HighTech => "HIGH_TECH",
+            WaypointTraitSymbol::Corrupt => "CORRUPT",
+            WaypointTraitSymbol::Bureaucratic => "BUREAUCRATIC",
+            WaypointTraitSymbol::TradingHub => "TRADING_HUB",
+            WaypointTraitSymbol::Industrial => "INDUSTRIAL",
+            WaypointTraitSymbol::BlackMarket => "BLACK_MARKET",
+            WaypointTraitSymbol::ResearchFacility => "RESEARCH_FACILITY",
+            WaypointTraitSymbol::MilitaryBase => "MILITARY_BASE",
+            WaypointTraitSymbol::SurveillanceOutpost => "SURVEILLANCE_OUTPOST",
+            WaypointTraitSymbol::ExplorationOutpost => "EXPLORATION_OUTPOST",
+            WaypointTraitSymbol::MineralDeposits => "MINERAL_DEPOSITS",
+            WaypointTraitSymbol::CommonMetalDeposits => "COMMON_METAL_DEPOSITS",
+            WaypointTraitSymbol::PreciousMetalDeposits => "PRECIOUS_METAL_DEPOSITS",
+            WaypointTraitSymbol::RareMetalDeposits => "RARE_METAL_DEPOSITS",
+            WaypointTraitSymbol::MethanePools => "METHANE_POOLS",
+            WaypointTraitSymbol::IceCrystals => "ICE_CRYSTALS",
+            WaypointTraitSymbol::ExplosiveGases => "EXPLOSIVE_GASES",
+            WaypointTraitSymbol::StrongMagnetosphere => "STRONG_MAGNETOSPHERE",
+            WaypointTraitSymbol::VibrantAuroras => "VIBRANT_AURORAS",
+            WaypointTraitSymbol::SaltFlats => "SALT_FLATS",
+            WaypointTraitSymbol::Canyons => "CANYONS",
+            WaypointTraitSymbol::PerpetualDaylight => "PERPETUAL_DAYLIGHT",
+            WaypointTraitSymbol::PerpetualOvercast => "PERPETUAL_OVERCAST",
+            WaypointTraitSymbol::DrySeabeds => "DRY_SEABEDS",
+            WaypointTraitSymbol::MagmaSeas => "MAGMA_SEAS",
+            WaypointTraitSymbol::Supervolcanoes => "SUPERVOLCANOES",
+            WaypointTraitSymbol::AshClouds => "ASH_CLOUDS",
+            WaypointTraitSymbol::VastRuins => "VAST_RUINS",
+            WaypointTraitSymbol::MutatedFlora => "MUTATED_FLORA",
+            WaypointTraitSymbol::Terraformed => "TERRAFORMED",
+            WaypointTraitSymbol::ExtremeTemperatures => "EXTREME_TEMPERATURES",
+            WaypointTraitSymbol::ExtremePressure => "EXTREME_PRESSURE",
+            WaypointTraitSymbol::DiverseLife => "DIVERSE_LIFE",
+            WaypointTraitSymbol::ScarceLife => "SCARCE_LIFE",
+            WaypointTraitSymbol::Fossils => "FOSSILS",
+            WaypointTraitSymbol::WeakGravity => "WEAK_GRAVITY",
+            WaypointTraitSymbol::StrongGravity => "STRONG_GRAVITY",
+            WaypointTraitSymbol::CrushingGravity => "CRUSHING_GRAVITY",
+            WaypointTraitSymbol::ToxicAtmosphere => "TOXIC_ATMOSPHERE",
+            WaypointTraitSymbol::CorrosiveAtmosphere => "CORROSIVE_ATMOSPHERE",
+            WaypointTraitSymbol::BreathableAtmosphere => "BREATHABLE_ATMOSPHERE",
+            WaypointTraitSymbol::ThinAtmosphere => "THIN_ATMOSPHERE",
+            WaypointTraitSymbol::Jovian => "JOVIAN",
+            WaypointTraitSymbol::Rocky => "ROCKY",
+            WaypointTraitSymbol::Volcanic => "VOLCANIC",
+            WaypointTraitSymbol::Frozen => "FROZEN",
+            WaypointTraitSymbol::Swamp => "SWAMP",
+            WaypointTraitSymbol::Barren => "BARREN",
+            WaypointTraitSymbol::Temperate => "TEMPERATE",
+            WaypointTraitSymbol::Jungle => "JUNGLE",
+            WaypointTraitSymbol::Ocean => "OCEAN",
+            WaypointTraitSymbol::Radioactive => "RADIOACTIVE",
+            WaypointTraitSymbol::MicroGravityAnomalies => "MICRO_GRAVITY_ANOMALIES",
+            WaypointTraitSymbol::DebrisCluster => "DEBRIS_CLUSTER",
+            WaypointTraitSymbol::DeepCraters => "DEEP_CRATERS",
+            WaypointTraitSymbol::ShallowCraters => "SHALLOW_CRATERS",
+            WaypointTraitSymbol::UnstableComposition => "UNSTABLE_COMPOSITION",
+            WaypointTraitSymbol::HollowedInterior => "HOLLOWED_INTERIOR",
+            WaypointTraitSymbol::Stripped => "STRIPPED",
+        };
+
+        write!(f, "{res}")
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum WaypointType {
@@ -1549,6 +1629,29 @@ pub enum WaypointType {
     GravityWell,
     ArtificialGravityWell,
     FuelStation,
+}
+
+impl Display for WaypointType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let res = match self {
+            WaypointType::Planet => "PLANET",
+            WaypointType::GasGiant => "GAS_GIANT",
+            WaypointType::Moon => "MOON",
+            WaypointType::OrbitalStation => "ORBITAL_STATION",
+            WaypointType::JumpGate => "JUMP_GATE",
+            WaypointType::AsteroidField => "ASTEROID_FIELD",
+            WaypointType::Asteroid => "ASTEROID",
+            WaypointType::EngineeredAsteroid => "ENGINEERED_ASTEROID",
+            WaypointType::AsteroidBase => "ASTEROID_BASE",
+            WaypointType::Nebula => "NEBULA",
+            WaypointType::DebrisField => "DEBRIS_FIELD",
+            WaypointType::GravityWell => "GRAVITY_WELL",
+            WaypointType::ArtificialGravityWell => "ARTIFICIAL_GRAVITY_WELL",
+            WaypointType::FuelStation => "FUEL_STATION",
+        };
+
+        write!(f, "{res}")
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -1645,6 +1748,7 @@ pub enum ApiResponseData {
     ListAgents(Vec<Agent>),
     ListFactions(Vec<Faction>),
     ListSystems(Vec<System>),
+    ListWaypoints(Vec<Waypoint>),
 }
 
 #[derive(Serialize, Deserialize, Debug)]

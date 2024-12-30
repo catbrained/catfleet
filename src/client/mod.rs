@@ -15,6 +15,7 @@ use tracing::{instrument, Level};
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Faction, FactionSymbol, JumpGate,
     Market, Meta, RegisterAgent, RegisterAgentSuccess, Shipyard, System, Waypoint,
+    WaypointTraitSymbol, WaypointType,
 };
 
 mod limit;
@@ -398,6 +399,46 @@ impl Client {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponse { data, meta }) => match data {
                 ApiResponseData::ListSystems(systems) => Ok((systems, meta)),
+                _ => Err(anyhow!("Unexpected response data: {data:?}")),
+            },
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn list_waypoints(
+        &mut self,
+        system_symbol: String,
+        limit: Option<u64>,
+        page: Option<u64>,
+        traits: Option<Vec<WaypointTraitSymbol>>,
+        waypoint_type: Option<WaypointType>,
+    ) -> Result<(Vec<Waypoint>, Meta), anyhow::Error> {
+        let limit = limit.unwrap_or(10);
+        let page = page.unwrap_or(1);
+        let waypoint_type = waypoint_type.map(|t| t.to_string()).unwrap_or_default();
+        let traits = traits
+            .map(|t| {
+                t.iter().fold(String::new(), |mut acc, el| {
+                    acc.push_str(&format!("&traits={el}"));
+                    acc
+                })
+            })
+            .unwrap_or_default();
+        let traits = traits.trim_end_matches('+');
+
+        let url = self
+            .base_url
+            .join(&format!("systems/{system_symbol}/waypoints?limit={limit}&page={page}&type={waypoint_type}{traits}"))
+            .map_err(anyhow::Error::new)?;
+
+        let req = Request::new(Method::GET, url);
+
+        let res = self.client.ready().await?.call(req).await?;
+
+        match res.json::<ApiResponse>().await {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponse { data, meta }) => match data {
+                ApiResponseData::ListWaypoints(waypoints) => Ok((waypoints, meta)),
                 _ => Err(anyhow!("Unexpected response data: {data:?}")),
             },
         }
