@@ -41,15 +41,15 @@ pub struct Agent {
 /// location visible to other agents.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename = "chart", rename_all = "camelCase")]
-struct Chart {
+pub struct Chart {
     // XXX: Are these fields all required or can they be null?
     /// The symbol of the waypoint.
     /// >= 1 characters
-    waypoint_symbol: String,
+    pub waypoint_symbol: String,
     /// The agent that submitted the chart for this waypoint.
-    submitted_by: String,
+    pub submitted_by: String,
     /// The time the chart for this waypoint was submitted.
-    submitted_on: String, // TODO: This is supposed to be a "date-time". Figure out what Rust type this maps to.
+    pub submitted_on: String, // TODO: This is supposed to be a "date-time". Figure out what Rust type this maps to.
 }
 
 // TODO: Figure out where this is used.
@@ -1395,39 +1395,39 @@ pub struct SystemWaypoint {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Waypoint {
-    symbol: String,
+pub struct Waypoint {
+    pub symbol: String,
     #[serde(rename = "type")]
-    waypoint_type: WaypointType,
-    system_symbol: String,
-    x: i64,
-    y: i64,
-    orbitals: Vec<WaypointOrbital>,
-    orbits: Option<String>,
-    faction: Option<WaypointFaction>,
-    traits: Vec<WaypointTrait>,
-    modifiers: Option<Vec<WaypointModifier>>,
-    chart: Option<Chart>,
-    is_under_construction: bool,
+    pub waypoint_type: WaypointType,
+    pub system_symbol: String,
+    pub x: i64,
+    pub y: i64,
+    pub orbitals: Vec<WaypointOrbital>,
+    pub orbits: Option<String>,
+    pub faction: Option<WaypointFaction>,
+    pub traits: Vec<WaypointTrait>,
+    pub modifiers: Option<Vec<WaypointModifier>>,
+    pub chart: Option<Chart>,
+    pub is_under_construction: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct WaypointFaction {
-    symbol: FactionSymbol,
+pub struct WaypointFaction {
+    pub symbol: FactionSymbol,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct WaypointModifier {
-    symbol: WaypointModifierSymbol,
-    name: String,
-    description: String,
+pub struct WaypointModifier {
+    pub symbol: WaypointModifierSymbol,
+    pub name: String,
+    pub description: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum WaypointModifierSymbol {
+pub enum WaypointModifierSymbol {
     Stripped,
     Unstable,
     RadiationLeak,
@@ -1437,25 +1437,25 @@ enum WaypointModifierSymbol {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct WaypointOrbital {
-    symbol: WaypointSymbol,
+pub struct WaypointOrbital {
+    pub symbol: WaypointSymbol,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct WaypointSymbol(String);
+pub struct WaypointSymbol(String);
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct WaypointTrait {
-    symbol: WaypointTraitSymbol,
-    name: String,
-    description: String,
+pub struct WaypointTrait {
+    pub symbol: WaypointTraitSymbol,
+    pub name: String,
+    pub description: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum WaypointTraitSymbol {
+pub enum WaypointTraitSymbol {
     Uncharted,
     UnderConstruction,
     Marketplace,
@@ -1631,6 +1631,7 @@ pub enum ApiResponseData {
     RegisterAgent(Box<RegisterAgentSuccess>),
     PublicAgent(Agent),
     GetSystem(System),
+    GetWaypoint(Waypoint),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
