@@ -42,14 +42,13 @@ pub struct Agent {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename = "chart", rename_all = "camelCase")]
 pub struct Chart {
-    // XXX: Are these fields all required or can they be null?
     /// The symbol of the waypoint.
     /// >= 1 characters
-    pub waypoint_symbol: String,
+    pub waypoint_symbol: Option<String>,
     /// The agent that submitted the chart for this waypoint.
-    pub submitted_by: String,
+    pub submitted_by: Option<String>,
     /// The time the chart for this waypoint was submitted.
-    pub submitted_on: String, // TODO: This is supposed to be a "date-time". Figure out what Rust type this maps to.
+    pub submitted_on: Option<String>, // TODO: This is supposed to be a "date-time". Figure out what Rust type this maps to.
 }
 
 // TODO: Figure out where this is used.
