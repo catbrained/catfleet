@@ -138,7 +138,7 @@ impl Client {
 
         match res.json::<ApiResponse>().await.map(|res| res.data) {
             Err(e) => Err(anyhow!(e)),
-            Ok(ApiResponseData::RegisterAgentSuccess(s)) => Ok(s),
+            Ok(ApiResponseData::RegisterAgent(s)) => Ok(s),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
@@ -162,7 +162,7 @@ impl Client {
 
         match res.json::<ApiResponse>().await.map(|res| res.data) {
             Err(e) => Err(anyhow!(e)),
-            Ok(ApiResponseData::PublicAgentSuccess(agent)) => Ok(agent),
+            Ok(ApiResponseData::PublicAgent(agent)) => Ok(agent),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
@@ -180,7 +180,7 @@ impl Client {
 
         match res.json::<ApiResponse>().await.map(|res| res.data) {
             Err(e) => Err(anyhow!(e)),
-            Ok(ApiResponseData::GetSystemSuccess(system)) => Ok(system),
+            Ok(ApiResponseData::GetSystem(system)) => Ok(system),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }

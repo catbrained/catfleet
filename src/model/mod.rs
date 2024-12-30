@@ -1628,9 +1628,9 @@ pub struct ApiResponse {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
 pub enum ApiResponseData {
-    RegisterAgentSuccess(Box<RegisterAgentSuccess>),
-    PublicAgentSuccess(Agent),
-    GetSystemSuccess(System),
+    RegisterAgent(Box<RegisterAgentSuccess>),
+    PublicAgent(Agent),
+    GetSystem(System),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
