@@ -13,7 +13,8 @@ use tower::{Layer, Service, ServiceExt};
 use tracing::{instrument, Level};
 
 use crate::model::{
-    ApiResponse, ApiResponseData, ApiStatus, FactionSymbol, RegisterAgent, RegisterAgentSuccess,
+    Agent, ApiResponse, ApiResponseData, ApiStatus, FactionSymbol, RegisterAgent,
+    RegisterAgentSuccess,
 };
 
 mod limit;
@@ -135,12 +136,34 @@ impl Client {
 
         debug_assert_eq!(res.status(), StatusCode::CREATED);
 
-        res.json::<ApiResponse>()
-            .await
-            .map(|res| {
-                let ApiResponseData::RegisterAgentSuccess(r) = res.data;
-                r
-            })
-            .map_err(anyhow::Error::new)
+        match res.json::<ApiResponse>().await.map(|res| res.data) {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::RegisterAgentSuccess(s)) => Ok(s),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn get_public_agent(&mut self, agent_name: String) -> Result<Agent, anyhow::Error> {
+        if !(3..=14).contains(&agent_name.len()) {
+            return Err(anyhow!(
+                "Agent name must be between 3 and 14 characters long"
+            ));
+        }
+
+        let url = self
+            .base_url
+            .join(&format!("agents/{agent_name}"))
+            .map_err(anyhow::Error::new)?;
+
+        let req = Request::new(Method::GET, url);
+
+        let res = self.client.ready().await?.call(req).await?;
+
+        match res.json::<ApiResponse>().await.map(|res| res.data) {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::PublicAgentSuccess(agent)) => Ok(agent),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
     }
 }

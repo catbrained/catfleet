@@ -1629,6 +1629,7 @@ pub struct ApiResponse {
 #[serde(untagged)]
 pub enum ApiResponseData {
     RegisterAgentSuccess(RegisterAgentSuccess),
+    PublicAgentSuccess(Agent),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
