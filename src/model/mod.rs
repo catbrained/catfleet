@@ -623,18 +623,18 @@ pub enum TransactionType {
 /// Meta details for pagination.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Meta {
+pub struct Meta {
     /// Show the total amount of items of this kind that exist.
     /// >= 0
-    total: u64,
+    pub total: u64,
     /// A page denotes an amount of items, offset from the first
     /// item. Each page hold an amount of items equal to the `limit`.
     /// >= 1
-    page: u64,
+    pub page: u64,
     /// The amount of items in each page. Limits how many items can
     /// be fetched at once.
     /// >= 1 && <= 20
-    limit: u8,
+    pub limit: u8,
 }
 
 /// Result of a repair transaction.
@@ -1628,6 +1628,7 @@ pub struct RegisterAgent {
 #[serde(rename_all = "camelCase")]
 pub struct ApiResponse {
     pub data: ApiResponseData,
+    pub meta: Meta,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
