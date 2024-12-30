@@ -497,12 +497,12 @@ pub enum FactionTraitSymbol {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct JumpGate {
+pub struct JumpGate {
     /// The symbol of the waypoint.
     /// >= 1 characters
-    symbol: String,
+    pub symbol: String,
     /// All the gates that are connected to this waypoint.
-    connections: Vec<String>, // XXX: Are these the ConnectedSystem things?
+    pub connections: Vec<String>, // XXX: Are these the ConnectedSystem things?
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -1639,6 +1639,7 @@ pub enum ApiResponseData {
     GetWaypoint(Waypoint),
     GetMarket(Market),
     GetShipyard(Shipyard),
+    GetJumpGate(JumpGate),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
