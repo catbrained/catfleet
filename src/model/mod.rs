@@ -68,9 +68,9 @@ struct ConnectedSystem {
     /// The symbol of the faction that owns the connected jump gate in the system.
     faction_symbol: Option<String>,
     /// Position in the universe in the x axis.
-    x: u64,
+    x: i64,
     /// Position in the universe in the y axis.
-    y: u64,
+    y: i64,
     /// The distance of this system to the connected jump gate.
     distance: u64,
 }
@@ -690,9 +690,9 @@ struct ScannedSystem {
     #[serde(rename = "type")]
     system_type: SystemType,
     /// Position in the universe in the x axis.
-    x: u64,
+    x: i64,
     /// Position in the universe in the y axis.
-    y: u64,
+    y: i64,
     /// The system's distance from the scanning ship.
     distance: u64,
 }
@@ -711,9 +711,9 @@ struct ScannedWaypoint {
     /// >= 1 characters
     system_symbol: String,
     /// Position in the universe in the x axis.
-    x: u64,
+    x: i64,
     /// Position in the universe in the y axis.
-    y: u64,
+    y: i64,
     /// List of waypoints that orbit this waypoint.
     orbitals: Vec<Waypoint>,
     /// The faction that controls the waypoint.
@@ -1162,8 +1162,8 @@ pub struct ShipNavRouteWaypoint {
     #[serde(rename = "type")]
     pub waypoint_type: WaypointType,
     pub system_symbol: String,
-    pub x: u64,
-    pub y: u64,
+    pub x: i64,
+    pub y: i64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
@@ -1347,8 +1347,8 @@ pub struct System {
     pub sector_symbol: String,
     #[serde(rename = "type")]
     pub system_type: SystemType,
-    pub x: u64,
-    pub y: u64,
+    pub x: i64,
+    pub y: i64,
     pub waypoints: Vec<SystemWaypoint>,
     pub factions: Vec<SystemFaction>,
 }
@@ -1387,8 +1387,8 @@ pub struct SystemWaypoint {
     symbol: String,
     #[serde(rename = "type")]
     waypoint_type: WaypointType,
-    x: u64,
-    y: u64,
+    x: i64,
+    y: i64,
     orbitals: Vec<WaypointOrbital>,
     orbits: Option<String>,
 }
@@ -1400,8 +1400,8 @@ struct Waypoint {
     #[serde(rename = "type")]
     waypoint_type: WaypointType,
     system_symbol: String,
-    x: u64,
-    y: u64,
+    x: i64,
+    y: i64,
     orbitals: Vec<WaypointOrbital>,
     orbits: Option<String>,
     faction: Option<WaypointFaction>,
