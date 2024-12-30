@@ -13,7 +13,7 @@ use tower::{Layer, Service, ServiceExt};
 use tracing::{instrument, Level};
 
 use crate::model::{
-    Agent, ApiResponse, ApiResponseData, ApiStatus, FactionSymbol, RegisterAgent,
+    Agent, ApiResponse, ApiResponseData, ApiStatus, FactionSymbol, Market, RegisterAgent,
     RegisterAgentSuccess, System, Waypoint,
 };
 
@@ -209,6 +209,31 @@ impl Client {
         match res.json::<ApiResponse>().await.map(|res| res.data) {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::GetWaypoint(waypoint)) => Ok(waypoint),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn get_market(&mut self, waypoint_symbol: String) -> Result<Market, anyhow::Error> {
+        let (system_symbol, _) = waypoint_symbol.split_at(
+            waypoint_symbol
+                .rfind('-')
+                .ok_or_else(|| anyhow!("Invalid waypoint symbol"))?,
+        );
+        let url = self
+            .base_url
+            .join(&format!(
+                "systems/{system_symbol}/waypoints/{waypoint_symbol}/market"
+            ))
+            .map_err(anyhow::Error::new)?;
+
+        let req = Request::new(Method::GET, url);
+
+        let res = self.client.ready().await?.call(req).await?;
+
+        match res.json::<ApiResponse>().await.map(|res| res.data) {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::GetMarket(market)) => Ok(market),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }

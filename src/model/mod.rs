@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 /// When activity is weak, consumption or production is near minimum capacity.
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ActivityLevel {
+pub enum ActivityLevel {
     Weak,
     Growing,
     Strong,
@@ -507,70 +507,70 @@ struct JumpGate {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Market {
+pub struct Market {
     /// The symbol of the market. The symbol is the same
     /// as the waypoint where the market is located.
-    symbol: String,
+    pub symbol: String,
     /// The list of goods that are exported from this market.
-    exports: Vec<TradeGood>,
+    pub exports: Vec<TradeGood>,
     /// The list of good that are sought as imports in this market.
-    imports: Vec<TradeGood>,
+    pub imports: Vec<TradeGood>,
     /// The list of goods that are bought and sold between agents at this market.
-    exchange: Vec<TradeGood>,
+    pub exchange: Vec<TradeGood>,
     /// The list of recent transactions at this market.
     /// Visible only when a ship is present at the market.
-    transactions: Option<Vec<MarketTransaction>>,
+    pub transactions: Option<Vec<MarketTransaction>>,
     /// The list of goods that are traded at this market.
     /// Visible only when a ship is present at the market.
-    trade_goods: Option<Vec<MarketTradeGood>>,
+    pub trade_goods: Option<Vec<MarketTradeGood>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct TradeGood {
+pub struct TradeGood {
     /// The good's symbol.
-    symbol: TradeSymbol,
+    pub symbol: TradeSymbol,
     /// The name of the good.
-    name: String,
+    pub name: String,
     /// The description of the good.
-    description: String,
+    pub description: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct MarketTradeGood {
+pub struct MarketTradeGood {
     /// The good's symbol.
-    symbol: TradeSymbol,
+    pub symbol: TradeSymbol,
     /// The type of trade good (export, import, or exchange).
     #[serde(rename = "type")]
-    good_type: TradeGoodType,
+    pub good_type: TradeGoodType,
     /// This is the maximum number of units that can be purchased or sold
     /// at this market in a single trade for this good. Trade volume also
     /// gives an indication of price volatility. A market with a low trade
     /// volume will have large price swings, while high trade volume will
     /// be more resilient to price changes.
     /// >= 1
-    trade_volume: u64,
+    pub trade_volume: u64,
     /// The supply level of a trade good.
-    supply: SupplyLevel,
+    pub supply: SupplyLevel,
     /// The activity level of a trade good. If the good is an import,
     /// this represents how strong consumption is. If the good is an
     /// export, this represents how strong the production is for the
     /// good. When activity is strong, consumption or production is near
     /// maximum capacity. When activity is weak, consumption or production
     /// is near minimum capacity.
-    activity: Option<ActivityLevel>,
+    pub activity: Option<ActivityLevel>,
     /// The prive at which this good can be purchased from the market.
     /// >= 0
-    purchase_price: u64,
+    pub purchase_price: u64,
     /// The price at which this good can be sold to the market.
     /// >= 0
-    sell_price: u64,
+    pub sell_price: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum TradeGoodType {
+pub enum TradeGoodType {
     Export,
     Import,
     Exchange,
@@ -578,7 +578,7 @@ enum TradeGoodType {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum SupplyLevel {
+pub enum SupplyLevel {
     Scarce,
     Limited,
     Moderate,
@@ -589,33 +589,33 @@ enum SupplyLevel {
 /// Result of a transaction with a market.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct MarketTransaction {
+pub struct MarketTransaction {
     /// The symbol of the waypoint.
     /// >= 1 characters
-    waypoint_symbol: String,
+    pub waypoint_symbol: String,
     /// The symbol of the ship that made the transaction.
-    ship_symbol: String,
+    pub ship_symbol: String,
     /// The symbol of the trade good.
-    trade_symbol: TradeSymbol,
+    pub trade_symbol: TradeSymbol,
     /// The type of transaction.
     #[serde(rename = "type")]
-    transaction_type: TransactionType,
+    pub transaction_type: TransactionType,
     /// The number of units of the transaction.
     /// >= 0
-    units: u64,
+    pub units: u64,
     /// The price per unit of the transaction.
     /// >= 0
-    price_per_unit: u64,
+    pub price_per_unit: u64,
     /// The total price of the transaction.
     /// >= 0
-    total_price: u64,
+    pub total_price: u64,
     /// The timestamp of the transaction.
-    timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum TransactionType {
+pub enum TransactionType {
     Purchase,
     Sell,
 }
@@ -1631,6 +1631,7 @@ pub enum ApiResponseData {
     PublicAgent(Agent),
     GetSystem(System),
     GetWaypoint(Waypoint),
+    GetMarket(Market),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
