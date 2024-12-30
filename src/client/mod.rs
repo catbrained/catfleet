@@ -14,7 +14,7 @@ use tracing::{instrument, Level};
 
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, FactionSymbol, RegisterAgent,
-    RegisterAgentSuccess,
+    RegisterAgentSuccess, System,
 };
 
 mod limit;
@@ -163,6 +163,24 @@ impl Client {
         match res.json::<ApiResponse>().await.map(|res| res.data) {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::PublicAgentSuccess(agent)) => Ok(agent),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn get_system(&mut self, system_symbol: String) -> Result<System, anyhow::Error> {
+        let url = self
+            .base_url
+            .join(&format!("systems/{system_symbol}"))
+            .map_err(anyhow::Error::new)?;
+
+        let req = Request::new(Method::GET, url);
+
+        let res = self.client.ready().await?.call(req).await?;
+
+        match res.json::<ApiResponse>().await.map(|res| res.data) {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::GetSystemSuccess(system)) => Ok(system),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }

@@ -78,7 +78,7 @@ struct ConnectedSystem {
 /// The type of system.
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum SystemType {
+pub enum SystemType {
     NeutronStar,
     RedStar,
     OrangeStar,
@@ -1342,20 +1342,20 @@ struct SurveyDeposit(String);
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct System {
-    symbol: SystemSymbol,
-    sector_symbol: String,
+pub struct System {
+    pub symbol: SystemSymbol,
+    pub sector_symbol: String,
     #[serde(rename = "type")]
-    system_type: SystemType,
-    x: u64,
-    y: u64,
-    waypoints: Vec<SystemWaypoint>,
-    factions: Vec<SystemFaction>,
+    pub system_type: SystemType,
+    pub x: u64,
+    pub y: u64,
+    pub waypoints: Vec<SystemWaypoint>,
+    pub factions: Vec<SystemFaction>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum SystemFaction {
+pub enum SystemFaction {
     Cosmic,
     Void,
     Galactic,
@@ -1379,11 +1379,11 @@ enum SystemFaction {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct SystemSymbol(String);
+pub struct SystemSymbol(String);
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct SystemWaypoint {
+pub struct SystemWaypoint {
     symbol: String,
     #[serde(rename = "type")]
     waypoint_type: WaypointType,
@@ -1630,6 +1630,7 @@ pub struct ApiResponse {
 pub enum ApiResponseData {
     RegisterAgentSuccess(Box<RegisterAgentSuccess>),
     PublicAgentSuccess(Agent),
+    GetSystemSuccess(System),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
