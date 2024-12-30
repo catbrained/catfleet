@@ -1738,7 +1738,7 @@ pub struct ApiResponse {
 #[serde(untagged)]
 pub enum ApiResponseData {
     RegisterAgent(Box<RegisterAgentSuccess>),
-    PublicAgent(Agent),
+    GetAgent(Agent),
     GetSystem(System),
     GetWaypoint(Waypoint),
     GetMarket(Market),

@@ -163,7 +163,7 @@ impl Client {
 
         match res.json::<ApiResponse>().await.map(|res| res.data) {
             Err(e) => Err(anyhow!(e)),
-            Ok(ApiResponseData::PublicAgent(agent)) => Ok(agent),
+            Ok(ApiResponseData::GetAgent(agent)) => Ok(agent),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
@@ -441,6 +441,21 @@ impl Client {
                 ApiResponseData::ListWaypoints(waypoints) => Ok((waypoints, meta)),
                 _ => Err(anyhow!("Unexpected response data: {data:?}")),
             },
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn get_agent(&mut self) -> Result<Agent, anyhow::Error> {
+        let url = self.base_url.join("my/agent").expect("URL should be valid");
+
+        let req = Request::new(Method::GET, url);
+
+        let res = self.client.ready().await?.call(req).await?;
+
+        match res.json::<ApiResponse>().await.map(|res| res.data) {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::GetAgent(agent)) => Ok(agent),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
 }
