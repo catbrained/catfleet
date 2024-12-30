@@ -1238,7 +1238,7 @@ pub enum ShipRole {
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[expect(clippy::enum_variant_names)]
-enum ShipType {
+pub enum ShipType {
     ShipProbe,
     ShipMiningDrone,
     ShipSiphonDrone,
@@ -1255,46 +1255,46 @@ enum ShipType {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Shipyard {
-    symbol: String,
-    ship_types: Vec<ShipType>,
-    transactions: Option<Vec<ShipyardTransaction>>,
-    ships: Option<Vec<ShipyardShip>>,
+pub struct Shipyard {
+    pub symbol: String,
+    pub ship_types: Vec<ShipType>,
+    pub transactions: Option<Vec<ShipyardTransaction>>,
+    pub ships: Option<Vec<ShipyardShip>>,
     /// The fee to modify a ship at this shipyard.
     /// This includes installing or removing modules
     /// and mounts on a ship. In the case of mounts, the
     /// fee is a flat rate per mount. In the case of modules,
     /// the fee is per slot the module occupies.
-    modifications_fee: u64,
+    pub modifications_fee: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipyardShip {
+pub struct ShipyardShip {
     #[serde(rename = "type")]
-    ship_type: ShipType,
-    name: String,
-    description: String,
-    supply: SupplyLevel,
-    activity: Option<ActivityLevel>,
-    purchase_price: u64,
-    frame: ShipFrame,
-    reactor: ShipReactor,
-    engine: ShipEngine,
-    modules: Vec<ShipModule>,
-    mounts: Vec<ShipMount>,
-    crew: ShipCrew,
+    pub ship_type: ShipType,
+    pub name: String,
+    pub description: String,
+    pub supply: SupplyLevel,
+    pub activity: Option<ActivityLevel>,
+    pub purchase_price: u64,
+    pub frame: ShipFrame,
+    pub reactor: ShipReactor,
+    pub engine: ShipEngine,
+    pub modules: Vec<ShipModule>,
+    pub mounts: Vec<ShipMount>,
+    pub crew: ShipCrew,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipyardTransaction {
-    waypoint_symbol: String,
-    ship_symbol: String,
-    ship_type: ShipType,
-    price: u64,
-    agent_symbol: String,
-    timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+pub struct ShipyardTransaction {
+    pub waypoint_symbol: String,
+    pub ship_symbol: String,
+    pub ship_type: ShipType,
+    pub price: u64,
+    pub agent_symbol: String,
+    pub timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -1632,6 +1632,7 @@ pub enum ApiResponseData {
     GetSystem(System),
     GetWaypoint(Waypoint),
     GetMarket(Market),
+    GetShipyard(Shipyard),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
