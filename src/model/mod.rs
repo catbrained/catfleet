@@ -1642,6 +1642,7 @@ pub enum ApiResponseData {
     GetShipyard(Shipyard),
     GetJumpGate(JumpGate),
     GetConstructionSite(Construction),
+    ListAgents(Vec<Agent>),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
