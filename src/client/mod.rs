@@ -9,7 +9,7 @@ use reqwest::{
     header::{self, HeaderValue},
     Method, Request, StatusCode, Url,
 };
-use tower::{Layer, Service, ServiceExt};
+use tower::{Service, ServiceBuilder, ServiceExt};
 use tracing::{instrument, Level};
 
 use crate::model::{
@@ -27,6 +27,22 @@ const RATELIMIT_DURATION_BURST: Duration = Duration::from_secs(60);
 
 #[derive(Debug)]
 struct InnerClient(RateLimitWithBurst<reqwest::Client>);
+
+impl InnerClient {
+    fn new() -> Self {
+        let client = reqwest::Client::new();
+        let rate_limit = RateLimitWithBurstLayer::new(
+            RATELIMIT_REQUESTS_DEFAULT,
+            RATELIMIT_DURATION_DEFAULT,
+            RATELIMIT_REQUESTS_BURST,
+            RATELIMIT_DURATION_BURST,
+        );
+
+        let service = ServiceBuilder::new().layer(rate_limit).service(client);
+
+        Self(service)
+    }
+}
 
 impl Deref for InnerClient {
     type Target = RateLimitWithBurst<reqwest::Client>;
@@ -51,15 +67,7 @@ pub struct Client {
 impl Client {
     #[instrument(level = Level::TRACE)]
     pub fn new() -> Self {
-        let client = reqwest::Client::new();
-        let rate_limit = RateLimitWithBurstLayer::new(
-            RATELIMIT_REQUESTS_DEFAULT,
-            RATELIMIT_DURATION_DEFAULT,
-            RATELIMIT_REQUESTS_BURST,
-            RATELIMIT_DURATION_BURST,
-        );
-
-        let client = InnerClient(rate_limit.layer(client));
+        let client = InnerClient::new();
 
         Self {
             client,
@@ -71,15 +79,7 @@ impl Client {
 
     #[instrument(level = Level::TRACE)]
     pub fn new_with_url(url: &str) -> Result<Self, anyhow::Error> {
-        let client = reqwest::Client::new();
-        let rate_limit = RateLimitWithBurstLayer::new(
-            RATELIMIT_REQUESTS_DEFAULT,
-            RATELIMIT_DURATION_DEFAULT,
-            RATELIMIT_REQUESTS_BURST,
-            RATELIMIT_DURATION_BURST,
-        );
-
-        let client = InnerClient(rate_limit.layer(client));
+        let client = InnerClient::new();
 
         Ok(Self {
             client,
