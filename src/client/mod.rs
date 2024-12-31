@@ -10,7 +10,8 @@ use reqwest::{
     Method, Request, StatusCode, Url,
 };
 use tower::{Service, ServiceBuilder, ServiceExt};
-use tracing::{instrument, Level};
+use tower_http::auth::{AddAuthorization, AddAuthorizationLayer};
+use tracing::{event, instrument, Level};
 
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Faction, FactionSymbol, JumpGate,
@@ -26,7 +27,7 @@ const RATELIMIT_REQUESTS_BURST: u64 = 30;
 const RATELIMIT_DURATION_BURST: Duration = Duration::from_secs(60);
 
 #[derive(Debug)]
-struct InnerClient(RateLimitWithBurst<reqwest::Client>);
+struct InnerClient(RateLimitWithBurst<AddAuthorization<reqwest::Client>>);
 
 impl InnerClient {
     fn new() -> Self {
@@ -37,15 +38,22 @@ impl InnerClient {
             RATELIMIT_REQUESTS_BURST,
             RATELIMIT_DURATION_BURST,
         );
+        let token = std::env::var("SPACETRADERS_TOKEN")
+            .map_err(|err| event!(Level::ERROR, %err, "SPACETRADERS_TOKEN not found"))
+            .unwrap();
+        let auth = AddAuthorizationLayer::bearer(&token).as_sensitive(true);
 
-        let service = ServiceBuilder::new().layer(rate_limit).service(client);
+        let service = ServiceBuilder::new()
+            .layer(rate_limit)
+            .layer(auth)
+            .service(client);
 
         Self(service)
     }
 }
 
 impl Deref for InnerClient {
-    type Target = RateLimitWithBurst<reqwest::Client>;
+    type Target = RateLimitWithBurst<AddAuthorization<reqwest::Client>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
