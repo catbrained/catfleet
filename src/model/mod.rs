@@ -1731,7 +1731,7 @@ pub struct RegisterAgent {
 #[serde(rename_all = "camelCase")]
 pub struct ApiResponse {
     pub data: ApiResponseData,
-    pub meta: Meta,
+    pub meta: Option<Meta>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
