@@ -1011,7 +1011,7 @@ pub struct ShipFuel {
 #[serde(rename_all = "camelCase")]
 pub struct FuelConsumption {
     pub amount: u64,
-    pub timestampt: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 /// Result of a transaction for a ship modification,
