@@ -1344,4 +1344,38 @@ impl Client {
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn sell_cargo(
+        &mut self,
+        ship: String,
+        cargo: TradeGoodAmount,
+    ) -> Result<(Agent, ShipCargo, MarketTransaction), anyhow::Error> {
+        let body = match serde_json::to_vec(&cargo) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/sell"))
+            .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::MarketTransaction {
+                agent,
+                cargo,
+                transaction,
+            }) => Ok((agent, cargo, transaction)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
 }
