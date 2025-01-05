@@ -1729,6 +1729,14 @@ pub struct RegisterAgent {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct DeliverContract {
+    pub ship_symbol: String,
+    pub trade_symbol: TradeSymbol,
+    pub units: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct ApiResponse {
     pub data: ApiResponseData,
     pub meta: Option<Meta>,
@@ -1751,7 +1759,11 @@ pub enum ApiResponseData {
     ListWaypoints(Vec<Waypoint>),
     ListContracts(Vec<Contract>),
     GetContract(Contract),
-    UpdateContract { agent: Agent, contract: Contract },
+    UpdateContract {
+        agent: Option<Agent>,
+        contract: Contract,
+        cargo: Option<ShipCargo>,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]

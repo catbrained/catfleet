@@ -14,9 +14,9 @@ use tower_http::auth::{AddAuthorization, AddAuthorizationLayer};
 use tracing::{event, instrument, Level};
 
 use crate::model::{
-    Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Contract, Faction, FactionSymbol,
-    JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, Shipyard, System, Waypoint,
-    WaypointTraitSymbol, WaypointType,
+    Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Contract, DeliverContract,
+    Faction, FactionSymbol, JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, ShipCargo,
+    Shipyard, System, TradeSymbol, Waypoint, WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
@@ -583,7 +583,11 @@ impl Client {
         let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
         match json {
             Err(e) => Err(anyhow!(e)),
-            Ok(ApiResponseData::UpdateContract { agent, contract }) => Ok((agent, contract)),
+            Ok(ApiResponseData::UpdateContract {
+                agent: Some(agent),
+                contract,
+                ..
+            }) => Ok((agent, contract)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
@@ -606,7 +610,52 @@ impl Client {
         let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
         match json {
             Err(e) => Err(anyhow!(e)),
-            Ok(ApiResponseData::UpdateContract { agent, contract }) => Ok((agent, contract)),
+            Ok(ApiResponseData::UpdateContract {
+                agent: Some(agent),
+                contract,
+                ..
+            }) => Ok((agent, contract)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn deliver_contract(
+        &mut self,
+        contract_id: String,
+        ship: String,
+        cargo: TradeSymbol,
+        amount: u64,
+    ) -> Result<(ShipCargo, Contract), anyhow::Error> {
+        let delivery = DeliverContract {
+            ship_symbol: ship,
+            trade_symbol: cargo,
+            units: amount,
+        };
+
+        let body = match serde_json::to_vec(&delivery) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri(format!("/my/contracts/{contract_id}/deliver"))
+            .method(Method::POST)
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::UpdateContract {
+                contract,
+                cargo: Some(cargo),
+                ..
+            }) => Ok((cargo, contract)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
