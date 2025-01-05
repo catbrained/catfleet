@@ -14,8 +14,8 @@ use tower_http::auth::{AddAuthorization, AddAuthorizationLayer};
 use tracing::{event, instrument, Level};
 
 use crate::model::{
-    Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Faction, FactionSymbol, JumpGate,
-    Market, Meta, RegisterAgent, RegisterAgentSuccess, Shipyard, System, Waypoint,
+    Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Contract, Faction, FactionSymbol,
+    JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, Shipyard, System, Waypoint,
     WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
@@ -509,6 +509,39 @@ impl Client {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::GetAgent(agent)) => Ok(agent),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn list_contracts(
+        &mut self,
+        limit: Option<u64>,
+        page: Option<u64>,
+    ) -> Result<(Vec<Contract>, Meta), anyhow::Error> {
+        let limit = limit.unwrap_or(10);
+        let page = page.unwrap_or(1);
+
+        let req = Request::builder()
+            .uri(format!("/my/contracts?limit={limit}&page={page}"))
+            .method(Method::GET)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader());
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponse {
+                data,
+                meta: Some(meta),
+            }) => match data {
+                ApiResponseData::ListContracts(contracts) => Ok((contracts, meta)),
+                _ => Err(anyhow!("Unexpected response data: {data:?}")),
+            },
+            Ok(ApiResponse { meta: None, .. }) => Err(anyhow!("Meta field missing in response")),
         }
     }
 }

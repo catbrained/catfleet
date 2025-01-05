@@ -97,4 +97,8 @@ async fn main() {
         Ok(agent) => event!(Level::INFO, ?agent),
         Err(e) => event!(Level::ERROR, %e),
     }
+    match client.list_contracts(Some(20), Some(1)).await {
+        Ok((contracts, meta)) => event!(Level::INFO, ?meta, ?contracts),
+        Err(e) => event!(Level::ERROR, %e),
+    }
 }
