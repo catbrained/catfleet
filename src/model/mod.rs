@@ -1909,3 +1909,11 @@ pub struct ShipRefuel {
     pub units: Option<u64>,
     pub from_cargo: Option<bool>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct CargoTransfer {
+    pub trade_symbol: TradeSymbol,
+    pub units: u64,
+    pub ship_symbol: String,
+}
