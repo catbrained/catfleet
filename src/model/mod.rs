@@ -1750,6 +1750,7 @@ pub enum ApiResponseData {
     ListSystems(Vec<System>),
     ListWaypoints(Vec<Waypoint>),
     ListContracts(Vec<Contract>),
+    GetContract(Contract),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
