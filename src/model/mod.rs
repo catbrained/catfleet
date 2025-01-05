@@ -708,22 +708,22 @@ struct ScannedShip {
 /// Details of a system that was scanned.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ScannedSystem {
+pub struct ScannedSystem {
     /// Symbol of the system.
     /// >= 1 characters
-    symbol: String,
+    pub symbol: String,
     /// Symbol of the system's sector.
     /// >= 1 characters
-    sector_symbol: String,
+    pub sector_symbol: String,
     /// The type of system.
     #[serde(rename = "type")]
-    system_type: SystemType,
+    pub system_type: SystemType,
     /// Position in the universe in the x axis.
-    x: i64,
+    pub x: i64,
     /// Position in the universe in the y axis.
-    y: i64,
+    pub y: i64,
     /// The system's distance from the scanning ship.
-    distance: u64,
+    pub distance: u64,
 }
 
 /// A waypoint that was scanned by a ship.
@@ -1853,6 +1853,10 @@ pub enum ApiResponseData {
         agent: Agent,
         cargo: ShipCargo,
         transaction: MarketTransaction,
+    },
+    ScanSystems {
+        cooldown: Cooldown,
+        systems: Vec<ScannedSystem>,
     },
 }
 
