@@ -1814,6 +1814,10 @@ pub enum ApiResponseData {
         produced: Vec<TradeGoodAmount>,
         consumed: Vec<TradeGoodAmount>,
     },
+    CreateChart {
+        chart: Chart,
+        waypoint: Waypoint,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
