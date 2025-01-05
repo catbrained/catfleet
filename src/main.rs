@@ -112,8 +112,12 @@ async fn main() {
     //     Ok(faction) => event!(Level::INFO, ?faction),
     //     Err(e) => event!(Level::ERROR, %e),
     // }
-    match client.list_ships(Some(20), Some(1)).await {
-        Ok((ships, meta)) => event!(Level::INFO, ?meta, ?ships),
+    // match client.list_ships(Some(20), Some(1)).await {
+    //     Ok((ships, meta)) => event!(Level::INFO, ?meta, ?ships),
+    //     Err(e) => event!(Level::ERROR, %e),
+    // }
+    match client.get_ship("CATBRAINED-3".to_string()).await {
+        Ok(ship) => event!(Level::INFO, ?ship),
         Err(e) => event!(Level::ERROR, %e),
     }
 }

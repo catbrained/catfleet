@@ -759,4 +759,24 @@ impl Client {
             Ok(ApiResponse { meta: None, .. }) => Err(anyhow!("Meta field missing in response")),
         }
     }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn get_ship(&mut self, ship: String) -> Result<Box<Ship>, anyhow::Error> {
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}"))
+            .method(Method::GET)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::GetShip(ship)) => Ok(ship),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
 }
