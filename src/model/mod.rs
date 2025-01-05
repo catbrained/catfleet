@@ -1030,12 +1030,12 @@ pub struct FuelConsumption {
 /// such as installing a mount or a module.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipModificationTransaction {
-    waypoint_symbol: String,
-    ship_symbol: String,
-    trade_symbol: TradeSymbol,
-    total_price: u64,
-    timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+pub struct ShipModificationTransaction {
+    pub waypoint_symbol: String,
+    pub ship_symbol: String,
+    pub trade_symbol: TradeSymbol,
+    pub total_price: u64,
+    pub timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 /// A module can be installed in a ship and provides
@@ -1874,6 +1874,12 @@ pub enum ApiResponseData {
     NegotiateContract {
         contract: Contract,
     },
+    InstallMount {
+        agent: Agent,
+        mounts: Vec<ShipMount>,
+        cargo: ShipCargo,
+        transaction: ShipModificationTransaction,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -1919,4 +1925,10 @@ pub struct CargoTransfer {
     pub trade_symbol: TradeSymbol,
     pub units: u64,
     pub ship_symbol: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct InstallMount {
+    pub symbol: MountType,
 }
