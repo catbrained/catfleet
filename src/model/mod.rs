@@ -1801,6 +1801,7 @@ pub enum ApiResponseData {
     GetShip(Box<Ship>),
     GetCargo(ShipCargo),
     GetNav(ShipNav),
+    GetMounts(Vec<ShipMount>),
 }
 
 #[derive(Serialize, Deserialize, Debug)]

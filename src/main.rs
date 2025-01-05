@@ -124,8 +124,12 @@ async fn main() {
     //     Ok(cargo) => event!(Level::INFO, ?cargo),
     //     Err(e) => event!(Level::ERROR, %e),
     // }
-    match client.get_ship_nav("CATBRAINED-3".to_string()).await {
-        Ok(nav) => event!(Level::INFO, ?nav),
+    // match client.get_ship_nav("CATBRAINED-3".to_string()).await {
+    //     Ok(nav) => event!(Level::INFO, ?nav),
+    //     Err(e) => event!(Level::ERROR, %e),
+    // }
+    match client.get_ship_mounts("CATBRAINED-3".to_string()).await {
+        Ok(mounts) => event!(Level::INFO, ?mounts),
         Err(e) => event!(Level::ERROR, %e),
     }
 }
