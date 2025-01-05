@@ -357,23 +357,23 @@ pub struct Cooldown {
 /// Extraction details.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Extraction {
+pub struct Extraction {
     /// Symbol of the ship that executed the extraction.
     /// >= 1 characters
-    ship_symbol: String,
+    pub ship_symbol: String,
     /// A yield from the extraction operation.
     #[serde(rename = "yield")]
-    extraction_yield: ExtractionYield,
+    pub extraction_yield: ExtractionYield,
 }
 
 /// A yield from the extraction operation.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ExtractionYield {
+pub struct ExtractionYield {
     /// The good's symbol.
-    symbol: TradeSymbol,
+    pub symbol: TradeSymbol,
     /// The number of units extracted that were placed into the ship's cargo hold.
-    units: u64,
+    pub units: u64,
 }
 
 /// Faction details.
@@ -848,18 +848,18 @@ pub struct ShipComponentIntegrity(f64);
 /// the condition of the ship.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ShipConditionEvent {
-    symbol: ShipConditionEventType,
-    component: ShipComponentType,
+pub struct ShipConditionEvent {
+    pub symbol: ShipConditionEventType,
+    pub component: ShipComponentType,
     /// The name of the event.
-    name: String,
+    pub name: String,
     /// A description of the event.
-    description: String,
+    pub description: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ShipConditionEventType {
+pub enum ShipConditionEventType {
     ReactorOverload,
     EnergySpikeFromMineral,
     SolarFlareInterference,
@@ -891,7 +891,7 @@ enum ShipConditionEventType {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum ShipComponentType {
+pub enum ShipComponentType {
     Frame,
     Reactor,
     Engine,
@@ -1821,6 +1821,12 @@ pub enum ApiResponseData {
     CreateSurvey {
         cooldown: Cooldown,
         surveys: Vec<Survey>,
+    },
+    ExtractResources {
+        cooldown: Cooldown,
+        extraction: Extraction,
+        cargo: ShipCargo,
+        events: Vec<ShipConditionEvent>,
     },
 }
 

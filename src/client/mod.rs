@@ -15,10 +15,10 @@ use tracing::{event, instrument, Level};
 
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Chart, Construction, Contract, Cooldown,
-    DeliverCargo, Faction, FactionSymbol, JumpGate, Market, Meta, Produce, RegisterAgent,
-    RegisterAgentSuccess, Ship, ShipCargo, ShipMount, ShipNav, ShipPurchase, ShipTransaction,
-    ShipType, Shipyard, ShipyardTransaction, Survey, System, TradeGoodAmount, TradeSymbol,
-    Waypoint, WaypointTraitSymbol, WaypointType,
+    DeliverCargo, Extraction, Faction, FactionSymbol, JumpGate, Market, Meta, Produce,
+    RegisterAgent, RegisterAgentSuccess, Ship, ShipCargo, ShipConditionEvent, ShipMount, ShipNav,
+    ShipPurchase, ShipTransaction, ShipType, Shipyard, ShipyardTransaction, Survey, System,
+    TradeGoodAmount, TradeSymbol, Waypoint, WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
@@ -1076,6 +1076,34 @@ impl Client {
         match json {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::CreateSurvey { cooldown, surveys }) => Ok((cooldown, surveys)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn extract_resources(
+        &mut self,
+        ship: String,
+    ) -> Result<(Cooldown, Extraction, ShipCargo, Vec<ShipConditionEvent>), anyhow::Error> {
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/extract"))
+            .method(Method::POST)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::ExtractResources {
+                cooldown,
+                extraction,
+                cargo,
+                events,
+            }) => Ok((cooldown, extraction, cargo, events)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
