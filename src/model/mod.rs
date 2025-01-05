@@ -729,29 +729,29 @@ pub struct ScannedSystem {
 /// A waypoint that was scanned by a ship.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ScannedWaypoint {
+pub struct ScannedWaypoint {
     /// The symbol of the waypoint.
     /// >= 1 characters
-    symbol: String,
+    pub symbol: String,
     /// The type of the waypoint.
     #[serde(rename = "type")]
-    waypoint_type: WaypointType,
+    pub waypoint_type: WaypointType,
     /// The symbol of the system.
     /// >= 1 characters
-    system_symbol: String,
+    pub system_symbol: String,
     /// Position in the universe in the x axis.
-    x: i64,
+    pub x: i64,
     /// Position in the universe in the y axis.
-    y: i64,
+    pub y: i64,
     /// List of waypoints that orbit this waypoint.
-    orbitals: Vec<Waypoint>,
+    pub orbitals: Vec<Waypoint>,
     /// The faction that controls the waypoint.
-    faction: Option<Faction>,
+    pub faction: Option<Faction>,
     /// The traits of the waypoint.
-    traits: Vec<WaypointTrait>,
+    pub traits: Vec<WaypointTrait>,
     /// The chart of a system or waypoint, which makes the location
     /// visible to other agents.
-    chart: Option<Chart>,
+    pub chart: Option<Chart>,
 }
 
 /// Ship details.
@@ -1857,6 +1857,10 @@ pub enum ApiResponseData {
     ScanSystems {
         cooldown: Cooldown,
         systems: Vec<ScannedSystem>,
+    },
+    ScanWaypoints {
+        cooldown: Cooldown,
+        waypoints: Vec<ScannedWaypoint>,
     },
 }
 

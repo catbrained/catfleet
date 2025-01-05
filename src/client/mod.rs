@@ -16,10 +16,11 @@ use tracing::{event, instrument, Level};
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Chart, Construction, Contract, Cooldown,
     DeliverCargo, Destination, Extraction, Faction, FactionSymbol, FlightMode, JumpGate, Market,
-    MarketTransaction, Meta, Produce, RegisterAgent, RegisterAgentSuccess, ScannedSystem, Ship,
-    ShipCargo, ShipConditionEvent, ShipFuel, ShipMount, ShipNav, ShipNavFlightMode, ShipPurchase,
-    ShipTransaction, ShipType, Shipyard, ShipyardTransaction, Siphon, Survey, System,
-    TradeGoodAmount, TradeSymbol, Waypoint, WaypointTraitSymbol, WaypointType,
+    MarketTransaction, Meta, Produce, RegisterAgent, RegisterAgentSuccess, ScannedSystem,
+    ScannedWaypoint, Ship, ShipCargo, ShipConditionEvent, ShipFuel, ShipMount, ShipNav,
+    ShipNavFlightMode, ShipPurchase, ShipTransaction, ShipType, Shipyard, ShipyardTransaction,
+    Siphon, Survey, System, TradeGoodAmount, TradeSymbol, Waypoint, WaypointTraitSymbol,
+    WaypointType,
 };
 use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
@@ -1398,6 +1399,32 @@ impl Client {
         match json {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::ScanSystems { cooldown, systems }) => Ok((cooldown, systems)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn scan_waypoints(
+        &mut self,
+        ship: String,
+    ) -> Result<(Cooldown, Vec<ScannedWaypoint>), anyhow::Error> {
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/scan/waypoints"))
+            .method(Method::POST)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::ScanWaypoints {
+                cooldown,
+                waypoints,
+            }) => Ok((cooldown, waypoints)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
