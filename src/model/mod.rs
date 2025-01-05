@@ -667,20 +667,20 @@ pub struct Meta {
     pub limit: u8,
 }
 
-/// Result of a repair transaction.
+/// Result of a repair or scrap transaction (or preview thereof).
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct RepairTransaction {
+pub struct ShipTransaction {
     /// The symbol of the waypoint.
     /// >= 1 characters
-    waypoint_symbol: String,
+    pub waypoint_symbol: String,
     /// The symbol of the ship.
-    ship_symbol: String,
+    pub ship_symbol: String,
     /// The total price of the transaction.
     /// >= 0
-    total_price: u64,
+    pub total_price: u64,
     /// The timestamp of the transaction.
-    timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 /// The ship that was scanned.
@@ -752,22 +752,6 @@ struct ScannedWaypoint {
     /// The chart of a system or waypoint, which makes the location
     /// visible to other agents.
     chart: Option<Chart>,
-}
-
-/// Result of a scrap transaction.
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct ScrapTransaction {
-    /// The symbol of the waypoint.
-    /// >= 1 characters
-    pub waypoint_symbol: String,
-    /// The symbol of the ship.
-    pub ship_symbol: String,
-    /// The total price of the transaction.
-    /// >= 0
-    pub total_price: u64,
-    /// The timestamp of the transaction.
-    pub timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 /// Ship details.
@@ -1802,8 +1786,8 @@ pub enum ApiResponseData {
     GetCargo(ShipCargo),
     GetNav(ShipNav),
     GetMounts(Vec<ShipMount>),
-    GetScrap {
-        transaction: ScrapTransaction,
+    GetShipTransaction {
+        transaction: ShipTransaction,
     },
 }
 

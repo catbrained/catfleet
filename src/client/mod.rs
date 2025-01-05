@@ -15,8 +15,8 @@ use tracing::{event, instrument, Level};
 
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Contract, DeliverCargo, Faction,
-    FactionSymbol, JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, ScrapTransaction,
-    Ship, ShipCargo, ShipMount, ShipNav, Shipyard, System, TradeSymbol, Waypoint,
+    FactionSymbol, JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, Ship, ShipCargo,
+    ShipMount, ShipNav, ShipTransaction, Shipyard, System, TradeSymbol, Waypoint,
     WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
@@ -842,10 +842,7 @@ impl Client {
     }
 
     #[instrument(level = Level::DEBUG, skip(self))]
-    pub async fn get_scrap_ship(
-        &mut self,
-        ship: String,
-    ) -> Result<ScrapTransaction, anyhow::Error> {
+    pub async fn get_scrap_ship(&mut self, ship: String) -> Result<ShipTransaction, anyhow::Error> {
         let req = Request::builder()
             .uri(format!("/my/ships/{ship}/scrap"))
             .method(Method::GET)
@@ -859,7 +856,30 @@ impl Client {
         let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
         match json {
             Err(e) => Err(anyhow!(e)),
-            Ok(ApiResponseData::GetScrap { transaction }) => Ok(transaction),
+            Ok(ApiResponseData::GetShipTransaction { transaction }) => Ok(transaction),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn get_repair_ship(
+        &mut self,
+        ship: String,
+    ) -> Result<ShipTransaction, anyhow::Error> {
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/repair"))
+            .method(Method::GET)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::GetShipTransaction { transaction }) => Ok(transaction),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
