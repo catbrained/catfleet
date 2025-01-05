@@ -1871,6 +1871,9 @@ pub enum ApiResponseData {
         fuel: ShipFuel,
         transaction: MarketTransaction,
     },
+    NegotiateContract {
+        contract: Contract,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]

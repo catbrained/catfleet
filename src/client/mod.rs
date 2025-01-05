@@ -1559,4 +1559,24 @@ impl Client {
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn negotiate_contract(&mut self, ship: String) -> Result<Contract, anyhow::Error> {
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/negotiate/contract"))
+            .method(Method::POST)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::NegotiateContract { contract }) => Ok(contract),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
 }
