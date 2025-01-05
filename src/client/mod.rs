@@ -17,7 +17,7 @@ use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Chart, Construction, Contract, Cooldown,
     DeliverCargo, Extraction, Faction, FactionSymbol, JumpGate, Market, Meta, Produce,
     RegisterAgent, RegisterAgentSuccess, Ship, ShipCargo, ShipConditionEvent, ShipMount, ShipNav,
-    ShipPurchase, ShipTransaction, ShipType, Shipyard, ShipyardTransaction, Survey, System,
+    ShipPurchase, ShipTransaction, ShipType, Shipyard, ShipyardTransaction, Siphon, Survey, System,
     TradeGoodAmount, TradeSymbol, Waypoint, WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
@@ -1104,6 +1104,34 @@ impl Client {
                 cargo,
                 events,
             }) => Ok((cooldown, extraction, cargo, events)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn siphon_resources(
+        &mut self,
+        ship: String,
+    ) -> Result<(Cooldown, Siphon, ShipCargo, Vec<ShipConditionEvent>), anyhow::Error> {
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/siphon"))
+            .method(Method::POST)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::SiphonResources {
+                cooldown,
+                siphon,
+                cargo,
+                events,
+            }) => Ok((cooldown, siphon, cargo, events)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }

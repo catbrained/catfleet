@@ -1319,17 +1319,17 @@ pub struct ShipyardTransaction {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Siphon {
-    ship_symbol: String,
+pub struct Siphon {
+    pub ship_symbol: String,
     #[serde(rename = "yield")]
-    siphon_yield: SiphonYield,
+    pub siphon_yield: SiphonYield,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct SiphonYield {
-    symbol: TradeSymbol,
-    units: u64,
+pub struct SiphonYield {
+    pub symbol: TradeSymbol,
+    pub units: u64,
 }
 
 /// A resource survey of a waypoint, detailing
@@ -1825,6 +1825,12 @@ pub enum ApiResponseData {
     ExtractResources {
         cooldown: Cooldown,
         extraction: Extraction,
+        cargo: ShipCargo,
+        events: Vec<ShipConditionEvent>,
+    },
+    SiphonResources {
+        cooldown: Cooldown,
+        siphon: Siphon,
         cargo: ShipCargo,
         events: Vec<ShipConditionEvent>,
     },
