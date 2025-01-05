@@ -1874,3 +1874,9 @@ pub struct TradeGoodAmount {
 pub struct Destination {
     pub waypoint_symbol: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct FlightMode {
+    pub flight_mode: ShipNavFlightMode,
+}
