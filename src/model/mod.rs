@@ -1756,6 +1756,12 @@ pub struct ShipPurchase {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct Produce {
+    pub produce: TradeSymbol,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct ApiResponse {
     pub data: ApiResponseData,
     pub meta: Option<Meta>,
@@ -1802,6 +1808,12 @@ pub enum ApiResponseData {
         ship: Box<Ship>,
         transaction: ShipyardTransaction,
     },
+    Refine {
+        cargo: ShipCargo,
+        cooldown: Cooldown,
+        produced: Vec<TradeGoodAmount>,
+        consumed: Vec<TradeGoodAmount>,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -1812,4 +1824,11 @@ pub struct RegisterAgentSuccess {
     pub faction: Faction,
     pub ship: Ship,
     pub token: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct TradeGoodAmount {
+    pub trade_symbol: TradeSymbol,
+    pub units: u64,
 }
