@@ -1169,4 +1169,33 @@ impl Client {
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn jettison_cargo(
+        &mut self,
+        ship: String,
+        cargo: TradeGoodAmount,
+    ) -> Result<ShipCargo, anyhow::Error> {
+        let body = match serde_json::to_vec(&cargo) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/jettison"))
+            .method(Method::POST)
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::GetCargo(cargo)) => Ok(cargo),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
 }

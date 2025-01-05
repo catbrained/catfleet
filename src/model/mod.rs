@@ -1849,6 +1849,7 @@ pub struct RegisterAgentSuccess {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TradeGoodAmount {
+    #[serde(rename(serialize = "symbol"))]
     pub trade_symbol: TradeSymbol,
     pub units: u64,
 }
