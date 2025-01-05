@@ -136,8 +136,12 @@ async fn main() {
     //     Ok(scrap) => event!(Level::INFO, ?scrap),
     //     Err(e) => event!(Level::ERROR, %e),
     // }
-    match client.get_repair_ship("CATBRAINED-2".to_string()).await {
-        Ok(repair) => event!(Level::INFO, ?repair),
+    // match client.get_repair_ship("CATBRAINED-2".to_string()).await {
+    //     Ok(repair) => event!(Level::INFO, ?repair),
+    //     Err(e) => event!(Level::ERROR, %e),
+    // }
+    match client.get_ship_cooldown("CATBRAINED-2".to_string()).await {
+        Ok(cooldown) => event!(Level::INFO, ?cooldown),
         Err(e) => event!(Level::ERROR, %e),
     }
 }

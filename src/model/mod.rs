@@ -1789,6 +1789,7 @@ pub enum ApiResponseData {
     GetShipTransaction {
         transaction: ShipTransaction,
     },
+    GetCooldown(Cooldown),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
