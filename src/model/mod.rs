@@ -1242,7 +1242,7 @@ pub struct ShipRegistration {
 #[serde(rename_all = "camelCase")]
 pub struct ShipRequirements {
     pub power: Option<u64>,
-    pub crew: Option<u64>,
+    pub crew: Option<i64>,
     pub slots: Option<u64>,
 }
 
