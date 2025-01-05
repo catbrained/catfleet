@@ -16,8 +16,8 @@ use tracing::{event, instrument, Level};
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Contract, Cooldown, DeliverCargo,
     Faction, FactionSymbol, JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, Ship,
-    ShipCargo, ShipMount, ShipNav, ShipTransaction, Shipyard, System, TradeSymbol, Waypoint,
-    WaypointTraitSymbol, WaypointType,
+    ShipCargo, ShipMount, ShipNav, ShipPurchase, ShipTransaction, ShipType, Shipyard,
+    ShipyardTransaction, System, TradeSymbol, Waypoint, WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
@@ -910,6 +910,44 @@ impl Client {
         match json {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::GetCooldown(cooldown)) => Ok(Some(cooldown)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn purchase_ship(
+        &mut self,
+        ship_type: ShipType,
+        waypoint: String,
+    ) -> Result<(Agent, Box<Ship>, ShipyardTransaction), anyhow::Error> {
+        let purchase = ShipPurchase {
+            ship_type,
+            waypoint_symbol: waypoint,
+        };
+
+        let body = match serde_json::to_vec(&purchase) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri("/my/ships")
+            .method(Method::POST)
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::ShipPurchase {
+                agent,
+                ship,
+                transaction,
+            }) => Ok((agent, ship, transaction)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }

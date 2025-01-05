@@ -1749,6 +1749,13 @@ pub struct DeliverCargo {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct ShipPurchase {
+    pub ship_type: ShipType,
+    pub waypoint_symbol: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct ApiResponse {
     pub data: ApiResponseData,
     pub meta: Option<Meta>,
@@ -1790,6 +1797,11 @@ pub enum ApiResponseData {
         transaction: ShipTransaction,
     },
     GetCooldown(Cooldown),
+    ShipPurchase {
+        agent: Agent,
+        ship: Box<Ship>,
+        transaction: ShipyardTransaction,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
