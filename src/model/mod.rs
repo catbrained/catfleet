@@ -1337,19 +1337,19 @@ struct SiphonYield {
 /// resources that can be found there.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct Survey {
+pub struct Survey {
     /// A unique signature for the location of this survey.
     /// This signature is verified when attempting an extraction using this survey.
-    signature: String,
-    symbol: String,
-    deposits: Vec<SurveyDeposit>,
-    expiration: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
-    size: DepositSize,
+    pub signature: String,
+    pub symbol: String,
+    pub deposits: Vec<SurveyDeposit>,
+    pub expiration: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub size: DepositSize,
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum DepositSize {
+pub enum DepositSize {
     Small,
     Moderate,
     Large,
@@ -1357,7 +1357,7 @@ enum DepositSize {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct SurveyDeposit(String);
+pub struct SurveyDeposit(String);
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -1817,6 +1817,10 @@ pub enum ApiResponseData {
     CreateChart {
         chart: Chart,
         waypoint: Waypoint,
+    },
+    CreateSurvey {
+        cooldown: Cooldown,
+        surveys: Vec<Survey>,
     },
 }
 

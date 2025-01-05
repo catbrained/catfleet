@@ -17,8 +17,8 @@ use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Chart, Construction, Contract, Cooldown,
     DeliverCargo, Faction, FactionSymbol, JumpGate, Market, Meta, Produce, RegisterAgent,
     RegisterAgentSuccess, Ship, ShipCargo, ShipMount, ShipNav, ShipPurchase, ShipTransaction,
-    ShipType, Shipyard, ShipyardTransaction, System, TradeGoodAmount, TradeSymbol, Waypoint,
-    WaypointTraitSymbol, WaypointType,
+    ShipType, Shipyard, ShipyardTransaction, Survey, System, TradeGoodAmount, TradeSymbol,
+    Waypoint, WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
@@ -1053,6 +1053,29 @@ impl Client {
         match json {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::GetNav(nav)) => Ok(nav),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn create_survey(
+        &mut self,
+        ship: String,
+    ) -> Result<(Cooldown, Vec<Survey>), anyhow::Error> {
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/survey"))
+            .method(Method::POST)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::CreateSurvey { cooldown, surveys }) => Ok((cooldown, surveys)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
