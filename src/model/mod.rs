@@ -1845,6 +1845,10 @@ pub enum ApiResponseData {
         nav: ShipNav,
         events: Vec<ShipConditionEvent>,
     },
+    WarpShip {
+        fuel: ShipFuel,
+        nav: ShipNav,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]

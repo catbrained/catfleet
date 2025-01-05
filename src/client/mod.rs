@@ -1278,4 +1278,38 @@ impl Client {
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn warp_ship(
+        &mut self,
+        ship: String,
+        destination: String,
+    ) -> Result<(ShipFuel, ShipNav), anyhow::Error> {
+        let destination = Destination {
+            waypoint_symbol: destination,
+        };
+
+        let body = match serde_json::to_vec(&destination) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/warp"))
+            .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::WarpShip { fuel, nav }) => Ok((fuel, nav)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
 }
