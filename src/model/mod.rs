@@ -1874,7 +1874,7 @@ pub enum ApiResponseData {
     NegotiateContract {
         contract: Contract,
     },
-    InstallMount {
+    ModifyMount {
         agent: Agent,
         mounts: Vec<ShipMount>,
         cargo: ShipCargo,
@@ -1929,6 +1929,6 @@ pub struct CargoTransfer {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct InstallMount {
+pub struct ModifyMount {
     pub symbol: MountType,
 }

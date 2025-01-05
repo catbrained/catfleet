@@ -15,8 +15,8 @@ use tracing::{event, instrument, Level};
 
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, CargoTransfer, Chart, Construction, Contract,
-    Cooldown, DeliverCargo, Destination, Extraction, Faction, FactionSymbol, FlightMode,
-    InstallMount, JumpGate, Market, MarketTransaction, Meta, MountType, Produce, RegisterAgent,
+    Cooldown, DeliverCargo, Destination, Extraction, Faction, FactionSymbol, FlightMode, JumpGate,
+    Market, MarketTransaction, Meta, ModifyMount, MountType, Produce, RegisterAgent,
     RegisterAgentSuccess, ScannedShip, ScannedSystem, ScannedWaypoint, Ship, ShipCargo,
     ShipConditionEvent, ShipFuel, ShipModificationTransaction, ShipMount, ShipNav,
     ShipNavFlightMode, ShipPurchase, ShipRefuel, ShipTransaction, ShipType, Shipyard,
@@ -1595,7 +1595,7 @@ impl Client {
         ),
         anyhow::Error,
     > {
-        let modification = InstallMount { symbol: mount };
+        let modification = ModifyMount { symbol: mount };
 
         let body = match serde_json::to_vec(&modification) {
             Ok(body) => body,
@@ -1616,7 +1616,52 @@ impl Client {
         let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
         match json {
             Err(e) => Err(anyhow!(e)),
-            Ok(ApiResponseData::InstallMount {
+            Ok(ApiResponseData::ModifyMount {
+                agent,
+                mounts,
+                cargo,
+                transaction,
+            }) => Ok((agent, mounts, cargo, transaction)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn remove_mount(
+        &mut self,
+        ship: String,
+        mount: MountType,
+    ) -> Result<
+        (
+            Agent,
+            Vec<ShipMount>,
+            ShipCargo,
+            ShipModificationTransaction,
+        ),
+        anyhow::Error,
+    > {
+        let modification = ModifyMount { symbol: mount };
+
+        let body = match serde_json::to_vec(&modification) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/mounts/remove"))
+            .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::ModifyMount {
                 agent,
                 mounts,
                 cargo,
