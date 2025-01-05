@@ -1840,6 +1840,11 @@ pub enum ApiResponseData {
         transaction: MarketTransaction,
         agent: Agent,
     },
+    NavigateShip {
+        fuel: ShipFuel,
+        nav: ShipNav,
+        events: Vec<ShipConditionEvent>,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]

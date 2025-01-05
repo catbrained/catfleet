@@ -17,8 +17,8 @@ use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Chart, Construction, Contract, Cooldown,
     DeliverCargo, Destination, Extraction, Faction, FactionSymbol, JumpGate, Market,
     MarketTransaction, Meta, Produce, RegisterAgent, RegisterAgentSuccess, Ship, ShipCargo,
-    ShipConditionEvent, ShipMount, ShipNav, ShipPurchase, ShipTransaction, ShipType, Shipyard,
-    ShipyardTransaction, Siphon, Survey, System, TradeGoodAmount, TradeSymbol, Waypoint,
+    ShipConditionEvent, ShipFuel, ShipMount, ShipNav, ShipPurchase, ShipTransaction, ShipType,
+    Shipyard, ShipyardTransaction, Siphon, Survey, System, TradeGoodAmount, TradeSymbol, Waypoint,
     WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
@@ -1241,6 +1241,40 @@ impl Client {
                 transaction,
                 agent,
             }) => Ok((nav, cooldown, transaction, agent)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn navigate_ship(
+        &mut self,
+        ship: String,
+        destination: String,
+    ) -> Result<(ShipFuel, ShipNav, Vec<ShipConditionEvent>), anyhow::Error> {
+        let destination = Destination {
+            waypoint_symbol: destination,
+        };
+
+        let body = match serde_json::to_vec(&destination) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/navigate"))
+            .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::NavigateShip { fuel, nav, events }) => Ok((fuel, nav, events)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
