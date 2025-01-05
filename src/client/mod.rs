@@ -659,4 +659,24 @@ impl Client {
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn get_faction(&mut self, faction: FactionSymbol) -> Result<Faction, anyhow::Error> {
+        let req = Request::builder()
+            .uri(format!("/factions/{faction}"))
+            .method(Method::GET)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::GetFaction(faction)) => Ok(faction),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
 }

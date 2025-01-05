@@ -101,11 +101,15 @@ async fn main() {
     //     Ok((contracts, meta)) => event!(Level::INFO, ?meta, ?contracts),
     //     Err(e) => event!(Level::ERROR, %e),
     // }
-    match client
-        .get_contract("cm54fmx7n9e3ws60c4lmtm00n".to_string())
-        .await
-    {
-        Ok(contract) => event!(Level::INFO, ?contract),
+    // match client
+    //     .get_contract("cm54fmx7n9e3ws60c4lmtm00n".to_string())
+    //     .await
+    // {
+    //     Ok(contract) => event!(Level::INFO, ?contract),
+    //     Err(e) => event!(Level::ERROR, %e),
+    // }
+    match client.get_faction(model::FactionSymbol::Cosmic).await {
+        Ok(faction) => event!(Level::INFO, ?faction),
         Err(e) => event!(Level::ERROR, %e),
     }
 }

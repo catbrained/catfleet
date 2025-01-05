@@ -422,6 +422,34 @@ pub enum FactionSymbol {
     Ethereal,
 }
 
+impl Display for FactionSymbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let res = match self {
+            FactionSymbol::Cosmic => "COSMIC",
+            FactionSymbol::Void => "VOID",
+            FactionSymbol::Galactic => "GALACTIC",
+            FactionSymbol::Quantum => "QUANTUM",
+            FactionSymbol::Dominion => "DOMINION",
+            FactionSymbol::Astro => "ASTRO",
+            FactionSymbol::Corsairs => "CORSAIRS",
+            FactionSymbol::Obsidian => "OBSIDIAN",
+            FactionSymbol::Aegis => "AEGIS",
+            FactionSymbol::United => "UNITED",
+            FactionSymbol::Solitary => "SOLITARY",
+            FactionSymbol::Cobalt => "COBALT",
+            FactionSymbol::Omega => "OMEGA",
+            FactionSymbol::Echo => "ECHO",
+            FactionSymbol::Lords => "LORDS",
+            FactionSymbol::Cult => "CULT",
+            FactionSymbol::Ancients => "ANCIENTS",
+            FactionSymbol::Shadow => "SHADOW",
+            FactionSymbol::Ethereal => "ETHEREAL",
+        };
+
+        write!(f, "{res}")
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct FactionTrait {
@@ -1764,6 +1792,7 @@ pub enum ApiResponseData {
         contract: Contract,
         cargo: Option<ShipCargo>,
     },
+    GetFaction(Faction),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
