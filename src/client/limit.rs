@@ -6,7 +6,6 @@ use std::{
 };
 
 use tokio::time::{Instant, Sleep};
-use tower::{Layer, Service};
 use tracing::{event, Level};
 
 #[derive(Debug, Clone)]
@@ -32,7 +31,7 @@ impl RateLimitWithBurstLayer {
     }
 }
 
-impl<S> Layer<S> for RateLimitWithBurstLayer {
+impl<S> tower_layer::Layer<S> for RateLimitWithBurstLayer {
     type Service = RateLimitWithBurst<S>;
 
     fn layer(&self, service: S) -> Self::Service {
@@ -110,9 +109,9 @@ impl Rate {
     }
 }
 
-impl<S, Request> Service<Request> for RateLimitWithBurst<S>
+impl<S, Request> tower_service::Service<Request> for RateLimitWithBurst<S>
 where
-    S: Service<Request>,
+    S: tower_service::Service<Request>,
 {
     type Response = S::Response;
 
