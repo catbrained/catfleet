@@ -14,8 +14,8 @@ use tower_http::auth::{AddAuthorization, AddAuthorizationLayer};
 use tracing::{event, instrument, Level};
 
 use crate::model::{
-    Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Contract, DeliverContract,
-    Faction, FactionSymbol, JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, ShipCargo,
+    Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Contract, DeliverCargo, Faction,
+    FactionSymbol, JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, ShipCargo,
     Shipyard, System, TradeSymbol, Waypoint, WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
@@ -627,7 +627,7 @@ impl Client {
         cargo: TradeSymbol,
         amount: u64,
     ) -> Result<(ShipCargo, Contract), anyhow::Error> {
-        let delivery = DeliverContract {
+        let delivery = DeliverCargo {
             ship_symbol: ship,
             trade_symbol: cargo,
             units: amount,
@@ -676,6 +676,53 @@ impl Client {
         match json {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::GetFaction(faction)) => Ok(faction),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn supply_construction(
+        &mut self,
+        waypoint: String,
+        ship: String,
+        cargo: TradeSymbol,
+        amount: u64,
+    ) -> Result<(ShipCargo, Construction), anyhow::Error> {
+        let (system, _) = waypoint.split_at(
+            waypoint
+                .rfind('-')
+                .ok_or_else(|| anyhow!("Invalid waypoint symbol"))?,
+        );
+        let delivery = DeliverCargo {
+            ship_symbol: ship,
+            trade_symbol: cargo,
+            units: amount,
+        };
+
+        let body = match serde_json::to_vec(&delivery) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri(format!(
+                "/systems/{system}/waypoints/{waypoint}/construction/supply"
+            ))
+            .method(Method::POST)
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::UpdateConstruction {
+                construction,
+                cargo,
+            }) => Ok((cargo, construction)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }

@@ -1757,7 +1757,7 @@ pub struct RegisterAgent {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct DeliverContract {
+pub struct DeliverCargo {
     pub ship_symbol: String,
     pub trade_symbol: TradeSymbol,
     pub units: u64,
@@ -1793,6 +1793,10 @@ pub enum ApiResponseData {
         cargo: Option<ShipCargo>,
     },
     GetFaction(Faction),
+    UpdateConstruction {
+        construction: Construction,
+        cargo: ShipCargo,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
