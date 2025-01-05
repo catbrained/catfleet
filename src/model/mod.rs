@@ -1884,6 +1884,11 @@ pub enum ApiResponseData {
         agent: Agent,
         transaction: ShipTransaction,
     },
+    RepairShip {
+        agent: Agent,
+        ship: Box<Ship>,
+        transaction: ShipTransaction,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
