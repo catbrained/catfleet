@@ -757,17 +757,17 @@ struct ScannedWaypoint {
 /// Result of a scrap transaction.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ScrapTransaction {
+pub struct ScrapTransaction {
     /// The symbol of the waypoint.
     /// >= 1 characters
-    waypoint_symbol: String,
+    pub waypoint_symbol: String,
     /// The symbol of the ship.
-    ship_symbol: String,
+    pub ship_symbol: String,
     /// The total price of the transaction.
     /// >= 0
-    total_price: u64,
+    pub total_price: u64,
     /// The timestamp of the transaction.
-    timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
+    pub timestamp: String, // TODO: This is supposed to be a "date-time". Figure out the correct Rust type for that.
 }
 
 /// Ship details.
@@ -1802,6 +1802,9 @@ pub enum ApiResponseData {
     GetCargo(ShipCargo),
     GetNav(ShipNav),
     GetMounts(Vec<ShipMount>),
+    GetScrap {
+        transaction: ScrapTransaction,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
