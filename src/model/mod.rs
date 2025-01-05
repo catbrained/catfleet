@@ -688,21 +688,21 @@ pub struct ShipTransaction {
 /// detected by the scanner.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct ScannedShip {
+pub struct ScannedShip {
     /// The globally unique identifier of the ship.
-    symbol: String,
+    pub symbol: String,
     /// The public registration information of the ship.
-    registration: ShipRegistration,
+    pub registration: ShipRegistration,
     /// The navigation information of the ship.
-    nav: ShipNav,
+    pub nav: ShipNav,
     /// The frame of the ship.
-    frame: Option<ShipFrame>,
+    pub frame: Option<ShipFrame>,
     /// The reactor of the ship.
-    reactor: Option<ShipReactor>,
+    pub reactor: Option<ShipReactor>,
     /// The engine of the ship.
-    engine: ShipEngine,
+    pub engine: ShipEngine,
     /// List of mounts installed in the ship.
-    mounts: Option<Vec<ShipMount>>,
+    pub mounts: Option<Vec<ShipMount>>,
 }
 
 /// Details of a system that was scanned.
@@ -1861,6 +1861,10 @@ pub enum ApiResponseData {
     ScanWaypoints {
         cooldown: Cooldown,
         waypoints: Vec<ScannedWaypoint>,
+    },
+    ScanShips {
+        cooldown: Cooldown,
+        ships: Vec<ScannedShip>,
     },
 }
 
