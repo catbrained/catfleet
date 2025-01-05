@@ -18,7 +18,7 @@ use crate::model::{
     DeliverCargo, Destination, Extraction, Faction, FactionSymbol, FlightMode, JumpGate, Market,
     MarketTransaction, Meta, Produce, RegisterAgent, RegisterAgentSuccess, ScannedShip,
     ScannedSystem, ScannedWaypoint, Ship, ShipCargo, ShipConditionEvent, ShipFuel, ShipMount,
-    ShipNav, ShipNavFlightMode, ShipPurchase, ShipTransaction, ShipType, Shipyard,
+    ShipNav, ShipNavFlightMode, ShipPurchase, ShipRefuel, ShipTransaction, ShipType, Shipyard,
     ShipyardTransaction, Siphon, Survey, System, TradeGoodAmount, TradeSymbol, Waypoint,
     WaypointTraitSymbol, WaypointType,
 };
@@ -1448,6 +1448,43 @@ impl Client {
         match json {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::ScanShips { cooldown, ships }) => Ok((cooldown, ships)),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn refuel_ship(
+        &mut self,
+        ship: String,
+        units: Option<u64>,
+        from_cargo: Option<bool>,
+    ) -> Result<(Agent, ShipFuel, MarketTransaction), anyhow::Error> {
+        let refuel = ShipRefuel { units, from_cargo };
+
+        let body = match serde_json::to_vec(&refuel) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/refuel"))
+            .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::RefuelShip {
+                agent,
+                fuel,
+                transaction,
+            }) => Ok((agent, fuel, transaction)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }

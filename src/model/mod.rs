@@ -1866,6 +1866,11 @@ pub enum ApiResponseData {
         cooldown: Cooldown,
         ships: Vec<ScannedShip>,
     },
+    RefuelShip {
+        agent: Agent,
+        fuel: ShipFuel,
+        transaction: MarketTransaction,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -1896,4 +1901,11 @@ pub struct Destination {
 #[serde(rename_all = "camelCase")]
 pub struct FlightMode {
     pub flight_mode: ShipNavFlightMode,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ShipRefuel {
+    pub units: Option<u64>,
+    pub from_cargo: Option<bool>,
 }
