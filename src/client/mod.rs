@@ -643,6 +643,7 @@ impl Client {
         let req = Request::builder()
             .uri(format!("/my/contracts/{contract_id}/deliver"))
             .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
             .body(Full::<Bytes>::new(body.into()))?;
 
         let res = self.inner.ready().await?.call(req).await?;
@@ -711,6 +712,7 @@ impl Client {
                 "/systems/{system}/waypoints/{waypoint}/construction/supply"
             ))
             .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
             .body(Full::<Bytes>::new(body.into()))?;
 
         let res = self.inner.ready().await?.call(req).await?;
@@ -934,6 +936,7 @@ impl Client {
         let req = Request::builder()
             .uri("/my/ships")
             .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
             .body(Full::<Bytes>::new(body.into()))?;
 
         let res = self.inner.ready().await?.call(req).await?;
@@ -997,6 +1000,7 @@ impl Client {
         let req = Request::builder()
             .uri(format!("/my/ships/{ship}/refine"))
             .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
             .body(Full::<Bytes>::new(body.into()))?;
 
         let res = self.inner.ready().await?.call(req).await?;
@@ -1150,6 +1154,7 @@ impl Client {
         let req = Request::builder()
             .uri(format!("/my/ships/{ship}/extract/survey"))
             .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
             .body(Full::<Bytes>::new(body.into()))?;
 
         let res = self.inner.ready().await?.call(req).await?;
@@ -1184,6 +1189,7 @@ impl Client {
         let req = Request::builder()
             .uri(format!("/my/ships/{ship}/jettison"))
             .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
             .body(Full::<Bytes>::new(body.into()))?;
 
         let res = self.inner.ready().await?.call(req).await?;
