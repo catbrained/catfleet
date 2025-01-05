@@ -15,7 +15,7 @@ use tracing::{event, instrument, Level};
 
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Construction, Contract, DeliverCargo, Faction,
-    FactionSymbol, JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, ShipCargo,
+    FactionSymbol, JumpGate, Market, Meta, RegisterAgent, RegisterAgentSuccess, Ship, ShipCargo,
     Shipyard, System, TradeSymbol, Waypoint, WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
@@ -724,6 +724,39 @@ impl Client {
                 cargo,
             }) => Ok((cargo, construction)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn list_ships(
+        &mut self,
+        limit: Option<u64>,
+        page: Option<u64>,
+    ) -> Result<(Vec<Ship>, Meta), anyhow::Error> {
+        let limit = limit.unwrap_or(10);
+        let page = page.unwrap_or(1);
+
+        let req = Request::builder()
+            .uri(format!("/my/ships?limit={limit}&page={page}"))
+            .method(Method::GET)
+            .body(Full::<Bytes>::new(Bytes::new()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader());
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponse {
+                data,
+                meta: Some(meta),
+            }) => match data {
+                ApiResponseData::ListShips(ships) => Ok((ships, meta)),
+                _ => Err(anyhow!("Unexpected response data: {data:?}")),
+            },
+            Ok(ApiResponse { meta: None, .. }) => Err(anyhow!("Meta field missing in response")),
         }
     }
 }

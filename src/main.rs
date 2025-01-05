@@ -108,8 +108,12 @@ async fn main() {
     //     Ok(contract) => event!(Level::INFO, ?contract),
     //     Err(e) => event!(Level::ERROR, %e),
     // }
-    match client.get_faction(model::FactionSymbol::Cosmic).await {
-        Ok(faction) => event!(Level::INFO, ?faction),
+    // match client.get_faction(model::FactionSymbol::Cosmic).await {
+    //     Ok(faction) => event!(Level::INFO, ?faction),
+    //     Err(e) => event!(Level::ERROR, %e),
+    // }
+    match client.list_ships(Some(20), Some(1)).await {
+        Ok((ships, meta)) => event!(Level::INFO, ?meta, ?ships),
         Err(e) => event!(Level::ERROR, %e),
     }
 }

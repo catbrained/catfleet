@@ -1797,6 +1797,7 @@ pub enum ApiResponseData {
         construction: Construction,
         cargo: ShipCargo,
     },
+    ListShips(Vec<Ship>),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
