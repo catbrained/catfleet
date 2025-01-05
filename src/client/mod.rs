@@ -15,10 +15,11 @@ use tracing::{event, instrument, Level};
 
 use crate::model::{
     Agent, ApiResponse, ApiResponseData, ApiStatus, Chart, Construction, Contract, Cooldown,
-    DeliverCargo, Extraction, Faction, FactionSymbol, JumpGate, Market, Meta, Produce,
-    RegisterAgent, RegisterAgentSuccess, Ship, ShipCargo, ShipConditionEvent, ShipMount, ShipNav,
-    ShipPurchase, ShipTransaction, ShipType, Shipyard, ShipyardTransaction, Siphon, Survey, System,
-    TradeGoodAmount, TradeSymbol, Waypoint, WaypointTraitSymbol, WaypointType,
+    DeliverCargo, Destination, Extraction, Faction, FactionSymbol, JumpGate, Market,
+    MarketTransaction, Meta, Produce, RegisterAgent, RegisterAgentSuccess, Ship, ShipCargo,
+    ShipConditionEvent, ShipMount, ShipNav, ShipPurchase, ShipTransaction, ShipType, Shipyard,
+    ShipyardTransaction, Siphon, Survey, System, TradeGoodAmount, TradeSymbol, Waypoint,
+    WaypointTraitSymbol, WaypointType,
 };
 use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
@@ -1201,6 +1202,45 @@ impl Client {
         match json {
             Err(e) => Err(anyhow!(e)),
             Ok(ApiResponseData::GetCargo(cargo)) => Ok(cargo),
+            Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
+        }
+    }
+
+    #[instrument(level = Level::DEBUG, skip(self))]
+    pub async fn jump_ship(
+        &mut self,
+        ship: String,
+        destination: String,
+    ) -> Result<(Box<ShipNav>, Cooldown, MarketTransaction, Agent), anyhow::Error> {
+        let destination = Destination {
+            waypoint_symbol: destination,
+        };
+
+        let body = match serde_json::to_vec(&destination) {
+            Ok(body) => body,
+            Err(e) => return Err(anyhow!(e)),
+        };
+
+        let req = Request::builder()
+            .uri(format!("/my/ships/{ship}/jump"))
+            .method(Method::POST)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Full::<Bytes>::new(body.into()))?;
+
+        let res = self.inner.ready().await?.call(req).await?;
+        event!(Level::DEBUG, "Response status: {}", res.status());
+
+        let body = res.collect().await?.aggregate();
+
+        let json = serde_json::from_reader(body.reader()).map(|res: ApiResponse| res.data);
+        match json {
+            Err(e) => Err(anyhow!(e)),
+            Ok(ApiResponseData::JumpShip {
+                nav,
+                cooldown,
+                transaction,
+                agent,
+            }) => Ok((nav, cooldown, transaction, agent)),
             Ok(d) => Err(anyhow!("Unexpected response data: {d:?}")),
         }
     }

@@ -1834,6 +1834,12 @@ pub enum ApiResponseData {
         cargo: ShipCargo,
         events: Vec<ShipConditionEvent>,
     },
+    JumpShip {
+        nav: Box<ShipNav>,
+        cooldown: Cooldown,
+        transaction: MarketTransaction,
+        agent: Agent,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -1852,4 +1858,10 @@ pub struct TradeGoodAmount {
     #[serde(rename(serialize = "symbol"))]
     pub trade_symbol: TradeSymbol,
     pub units: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct Destination {
+    pub waypoint_symbol: String,
 }
