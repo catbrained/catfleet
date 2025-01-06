@@ -1,8 +1,10 @@
+import Status from "./components/Status"
+
 function App() {
 
   return (
     <>
-      <h1>Hello World</h1>
+      <Status />
     </>
   )
 }
