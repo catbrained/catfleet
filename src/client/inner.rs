@@ -1,6 +1,6 @@
 use std::{error::Error, future::Future, pin::Pin, sync::Arc, task::Poll};
 
-use anyhow::Context;
+use anyhow::{anyhow, Context};
 use hyper::{
     body::{Body, Incoming},
     header, Request, Response, Uri,
@@ -21,7 +21,7 @@ pub struct InnerClient<B> {
 
 impl<B> InnerClient<B>
 where
-    B: Body + Send + Unpin + 'static,
+    B: Body + Send + Unpin + Clone + 'static,
     B::Data: Send,
     B::Error: Into<Box<dyn Error + Send + Sync>>,
 {
@@ -144,10 +144,19 @@ where
 
         event!(Level::TRACE, "Sending request");
 
-        self.sender
-            .send_request(req)
-            .await
-            .map_err(anyhow::Error::new)
+        // XXX: Is this really the correct way of doing this?
+        loop {
+            self.sender.ready().await.unwrap();
+
+            break match self.sender.send_request(req.clone()).await {
+                Ok(res) => Ok(res),
+                Err(e) if e.is_canceled() => {
+                    event!(Level::WARN, "Request was cancelled. Retrying...");
+                    continue;
+                }
+                Err(e) => Err(anyhow!(e)),
+            };
+        }
     }
 
     #[instrument(level = Level::TRACE, skip(self, req))]
@@ -190,7 +199,7 @@ impl Future for ResponseFuture {
 
 impl<B> tower_service::Service<Request<B>> for InnerClient<B>
 where
-    B: Body + Send + Unpin + 'static,
+    B: Body + Send + Unpin + Clone + 'static,
     B::Data: Send,
     B::Error: Into<Box<dyn Error + Send + Sync>>,
 {
