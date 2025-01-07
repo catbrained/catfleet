@@ -129,6 +129,7 @@
           # Extra inputs can be added here; cargo and rustc are provided by default.
           packages = [
             pkgs.yarn
+            pkgs.nodePackages_latest.prettier
           ];
         };
       });
