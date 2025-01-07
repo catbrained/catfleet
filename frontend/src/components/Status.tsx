@@ -60,14 +60,23 @@ function Status() {
     return response.json();
   };
 
-  const { isPending, isError, isFetching, data, error } = useQuery({ queryKey: ["status"], queryFn: fetchStatus, staleTime: 1000 * 10, refetchInterval: 1000 * 15 });
+  const { isPending, isError, isFetching, data, error } = useQuery({
+    queryKey: ["status"],
+    queryFn: fetchStatus,
+    staleTime: 1000 * 10,
+    refetchInterval: 1000 * 15,
+  });
 
   if (isPending) {
     return <span>Loading...</span>;
   }
 
   if (isError) {
-    return <span>Something went wrong! Please try again. (Error message: {error.message})</span>;
+    return (
+      <span>
+        Something went wrong! Please try again. (Error message: {error.message})
+      </span>
+    );
   }
 
   return (
@@ -82,7 +91,7 @@ function Status() {
       </ul>
       {isFetching && <span>Refreshing...</span>}
     </>
-  )
+  );
 }
 
-export default Status
+export default Status;
