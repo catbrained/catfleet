@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 const BASE_URL = "http://localhost:5173";
 
@@ -52,58 +52,35 @@ interface AgentCharts {
 }
 
 function Status() {
-  const [error, setError] = useState();
-  const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState<Status | null>(null);
+  const fetchStatus = async (): Promise<Status> => {
+    const response = await fetch(`${BASE_URL}/status`);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
+  };
 
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const { isPending, isError, isFetching, data, error } = useQuery({ queryKey: ["status"], queryFn: fetchStatus, staleTime: 1000 * 10, refetchInterval: 1000 * 15 });
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      abortControllerRef.current?.abort();
-      abortControllerRef.current = new AbortController();
-
-      setIsLoading(true);
-
-      try {
-        const response = await fetch(`${BASE_URL}/status`, {
-          signal: abortControllerRef.current?.signal
-        });
-        const status = await response.json() as Status;
-        setStatus(status);
-      } catch (e: any) {
-        if (e.name === "AbortError") {
-          console.log("Aborted request");
-          return;
-        }
-
-        setError(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchStatus();
-  }, []);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (isPending) {
+    return <span>Loading...</span>;
   }
 
-  if (error) {
-    return <div>Something went wrong! Please try again.</div>;
+  if (isError) {
+    return <span>Something went wrong! Please try again. (Error message: {error.message})</span>;
   }
 
   return (
     <>
       <h1>Status</h1>
       <ul>
-        <li>SpaceTraders API: {status?.status}</li>
-        <li>SpaceTraders Version: {status?.version}</li>
-        <li>Last reset date: {status?.resetDate}</li>
-        <li>Next reset date: {status?.serverResets.next}</li>
-        <li>Reset frequency: {status?.serverResets.frequency}</li>
+        <li>SpaceTraders API: {data.status}</li>
+        <li>SpaceTraders Version: {data.version}</li>
+        <li>Last reset date: {data.resetDate}</li>
+        <li>Next reset date: {data.serverResets.next}</li>
+        <li>Reset frequency: {data.serverResets.frequency}</li>
       </ul>
+      {isFetching && <span>Refreshing...</span>}
     </>
   )
 }
