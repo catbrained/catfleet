@@ -7,7 +7,7 @@ use anyhow::anyhow;
 use http_body_util::{BodyExt, Full};
 use hyper::{
     body::{Buf, Bytes},
-    header, Method, Request, StatusCode,
+    header, Method, Request, StatusCode, Uri,
 };
 use tower::{Service, ServiceBuilder, ServiceExt};
 use tower_http::auth::{AddAuthorization, AddAuthorizationLayer};
@@ -23,6 +23,7 @@ use crate::model::{
     ShipyardTransaction, Siphon, Survey, System, TradeGoodAmount, TradeSymbol, Waypoint,
     WaypointTraitSymbol, WaypointType,
 };
+use base_url::{BaseUrl, BaseUrlLayer};
 use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
 
@@ -36,11 +37,12 @@ const RATELIMIT_REQUESTS_BURST: u64 = 30;
 const RATELIMIT_DURATION_BURST: Duration = Duration::from_secs(60);
 
 #[derive(Debug)]
-struct WrappedClient(RateLimitWithBurst<AddAuthorization<InnerClient<Full<Bytes>>>>);
+struct WrappedClient(RateLimitWithBurst<AddAuthorization<BaseUrl<InnerClient<Full<Bytes>>>>>);
 
 impl WrappedClient {
-    async fn new(url: &str) -> Result<Self, anyhow::Error> {
-        let client = InnerClient::new(url).await?;
+    async fn new(base_url: &str) -> Result<Self, anyhow::Error> {
+        let base_url = Uri::try_from(base_url)?;
+        let client = InnerClient::new(base_url.clone()).await?;
         let rate_limit = RateLimitWithBurstLayer::new(
             RATELIMIT_REQUESTS_DEFAULT,
             RATELIMIT_DURATION_DEFAULT,
@@ -51,10 +53,12 @@ impl WrappedClient {
             .map_err(|err| event!(Level::ERROR, %err, "SPACETRADERS_TOKEN not found"))
             .unwrap();
         let auth = AddAuthorizationLayer::bearer(&token).as_sensitive(true);
+        let base_url = BaseUrlLayer::new(base_url);
 
         let service = ServiceBuilder::new()
             .layer(rate_limit)
             .layer(auth)
+            .layer(base_url)
             .service(client);
 
         Ok(Self(service))
@@ -62,7 +66,7 @@ impl WrappedClient {
 }
 
 impl Deref for WrappedClient {
-    type Target = RateLimitWithBurst<AddAuthorization<InnerClient<Full<Bytes>>>>;
+    type Target = RateLimitWithBurst<AddAuthorization<BaseUrl<InnerClient<Full<Bytes>>>>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
