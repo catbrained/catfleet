@@ -28,6 +28,7 @@ use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
 
 mod base_url;
+mod extra_headers;
 pub mod inner;
 mod limit;
 
