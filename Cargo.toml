@@ -24,3 +24,7 @@ http-body-util = "0.1.2"
 tokio-rustls = { version = "0.26.1", default-features = false, features = [ "ring" ] }
 webpki-roots = "0.26.7"
 axum = { version = "0.8.1", features = [ "http2" ] }
+
+[dev-dependencies]
+tokio-test = "0.4.4"
+tower-test = "0.4.0"

@@ -210,3 +210,112 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tokio::time;
+    use tokio_test::{assert_pending, assert_ready_ok};
+    use tower_test::{assert_request_eq, mock};
+
+    fn trace_init() -> tracing::subscriber::DefaultGuard {
+        let subscriber = tracing_subscriber::fmt()
+            .with_test_writer()
+            .with_max_level(tracing::Level::TRACE)
+            .with_thread_names(true)
+            .finish();
+        tracing::subscriber::set_default(subscriber)
+    }
+
+    #[tokio::test]
+    async fn reaches_limit_and_refills_buckets_independently() {
+        let _t = trace_init();
+        time::pause();
+
+        let rate_limit = RateLimitWithBurstLayer::new(
+            1,
+            Duration::from_millis(100),
+            2,
+            Duration::from_millis(400),
+        );
+        let (mut service, mut handle) = mock::spawn_layer(rate_limit);
+
+        // Should start out ready.
+        assert_ready_ok!(service.poll_ready());
+
+        let response = service.call("hello 1");
+
+        assert_request_eq!(handle, "hello 1").send_response("world 1");
+        assert_eq!(response.await.unwrap(), "world 1");
+
+        // Should still be ready after default bucket is empty,
+        // because we still have two in the burst bucket.
+        assert_ready_ok!(service.poll_ready());
+
+        let response = service.call("hello 2");
+
+        assert_request_eq!(handle, "hello 2").send_response("world 2");
+        assert_eq!(response.await.unwrap(), "world 2");
+
+        // Should still be ready after default bucket is empty,
+        // because we still have one in the burst bucket.
+        assert_ready_ok!(service.poll_ready());
+
+        let response = service.call("hello 3");
+
+        assert_request_eq!(handle, "hello 3").send_response("world 3");
+        assert_eq!(response.await.unwrap(), "world 3");
+
+        // Should be pending, because we have exhausted both the default and the burst bucket.
+        assert_pending!(service.poll_ready());
+        assert_pending!(handle.poll_request());
+
+        // Advance time past the interval of the default bucket.
+        time::advance(Duration::from_millis(101)).await;
+
+        // Should be ready again because the default bucket should have been refilled.
+        assert_ready_ok!(service.poll_ready());
+
+        let response = service.call("ping 1");
+
+        assert_request_eq!(handle, "ping 1").send_response("pong 1");
+        assert_eq!(response.await.unwrap(), "pong 1");
+
+        // Should be pending, because we have exhausted the default bucket again,
+        // and the burst bucket has not refilled yet. (Elapsed time: 101 ms)
+        assert_pending!(service.poll_ready());
+        assert_pending!(handle.poll_request());
+
+        // Advance time until the burst bucket refills.
+        time::advance(Duration::from_millis(301)).await;
+
+        // Should be ready again, because both buckets should have been refilled.
+        // (Elapsed time: 402 ms)
+        assert_ready_ok!(service.poll_ready());
+
+        let response = service.call("check 1");
+
+        assert_request_eq!(handle, "check 1").send_response("ok 1");
+        assert_eq!(response.await.unwrap(), "ok 1");
+
+        // Should still be ready because we still have the burst bucket.
+        assert_ready_ok!(service.poll_ready());
+
+        let response = service.call("check 2");
+
+        assert_request_eq!(handle, "check 2").send_response("ok 2");
+        assert_eq!(response.await.unwrap(), "ok 2");
+
+        // Should still be ready because we still have the burst bucket.
+        assert_ready_ok!(service.poll_ready());
+
+        let response = service.call("check 3");
+
+        assert_request_eq!(handle, "check 3").send_response("ok 3");
+        assert_eq!(response.await.unwrap(), "ok 3");
+
+        // Should be pending, because we have exhausted both the default and the burst bucket.
+        assert_pending!(service.poll_ready());
+        assert_pending!(handle.poll_request());
+    }
+}
