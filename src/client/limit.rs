@@ -135,6 +135,7 @@ where
         }
 
         // At least one bucket is due for a refill.
+        event!(Level::TRACE, rem = self.rem, "bucket due for refill");
         let now = Instant::now();
 
         // If the default rate limit period has elapsed,
@@ -144,6 +145,7 @@ where
             // Only refill up to the maximum of default bucket + burst bucket.
             self.rem = (self.rem + self.rate_default.num())
                 .min(self.rate_default.num() + self.rate_burst.num());
+            event!(Level::TRACE, rem = self.rem, "refilled default bucket");
         }
 
         // If the burst rate limit period has elapsed,
@@ -153,6 +155,7 @@ where
             // Only refill up to the maximum of default bucket + burst bucket.
             self.rem = (self.rem + self.rate_burst.num())
                 .min(self.rate_default.num() + self.rate_burst.num());
+            event!(Level::TRACE, rem = self.rem, "refilled burst bucket");
         }
 
         // Go back to Ready state.
@@ -173,6 +176,7 @@ where
                     // Only refill up to the maximum of default bucket + burst bucket.
                     self.rem = (self.rem + self.rate_default.num())
                         .min(self.rate_default.num() + self.rate_burst.num());
+                    event!(Level::TRACE, rem = self.rem, "refilled default bucket");
                 }
 
                 // If the burst rate limit period has elapsed,
@@ -182,6 +186,7 @@ where
                     // Only refill up to the maximum of default bucket + burst bucket.
                     self.rem = (self.rem + self.rate_burst.num())
                         .min(self.rate_default.num() + self.rate_burst.num());
+                    event!(Level::TRACE, rem = self.rem, "refilled burst bucket");
                 }
 
                 // If we have more than one token remaining,
@@ -189,6 +194,7 @@ where
                 if self.rem > 1 {
                     self.rem -= 1;
                     self.state = State::Ready;
+                    event!(Level::TRACE, rem = self.rem, "remaining ready");
                 } else {
                     // We're spending the last token in the bucket.
                     // Reset the sleep until either the default refill
@@ -198,6 +204,8 @@ where
                     } else {
                         self.until_burst
                     };
+
+                    event!(Level::TRACE, rem = self.rem, "going back to limited");
 
                     self.sleep.as_mut().reset(until);
                     // Can't service any more requests until next refill.
