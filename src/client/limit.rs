@@ -196,6 +196,8 @@ where
                     self.state = State::Ready;
                     event!(Level::TRACE, rem = self.rem, "remaining ready");
                 } else {
+                    debug_assert_eq!(self.rem, 1);
+                    self.rem -= 1;
                     // We're spending the last token in the bucket.
                     // Reset the sleep until either the default refill
                     // or burst refill, whichever is shorter.
