@@ -3,7 +3,7 @@ use std::{error::Error, future::Future, pin::Pin, sync::Arc, task::Poll};
 use anyhow::{anyhow, Context};
 use hyper::{
     body::{Body, Incoming},
-    header, Request, Response, Uri,
+    Request, Response, Uri,
 };
 use hyper_util::rt::{TokioExecutor, TokioIo};
 use tokio::net::TcpStream;
@@ -92,24 +92,11 @@ where
         Ok(Self { sender })
     }
 
-    #[instrument(level = Level::DEBUG, skip(self, req), fields(req.url))]
+    #[instrument(level = Level::DEBUG, skip(self, req), fields(req.url =% req.uri()))]
     pub async fn send_request(
         mut self,
         mut req: Request<B>,
     ) -> Result<Response<Incoming>, anyhow::Error> {
-        let headers = req.headers_mut();
-        if let Some(ua) = headers.insert(
-            header::USER_AGENT,
-            "catfleet/0.1.0"
-                .try_into()
-                .expect("user agent should be valid"),
-        ) {
-            event!(
-                Level::WARN,
-                ?ua,
-                "USER_AGENT header should only be set in one place"
-            );
-        }
         *req.version_mut() = hyper::Version::HTTP_2;
 
         event!(Level::TRACE, "Sending request");

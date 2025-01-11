@@ -1,5 +1,6 @@
 use std::{
     ops::{Deref, DerefMut},
+    sync::Arc,
     time::Duration,
 };
 
@@ -24,6 +25,7 @@ use crate::model::{
     WaypointTraitSymbol, WaypointType,
 };
 use base_url::{BaseUrl, BaseUrlLayer};
+use extra_headers::{ExtraHeaders, ExtraHeadersLayer};
 use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
 
@@ -37,8 +39,11 @@ const RATELIMIT_DURATION_DEFAULT: Duration = Duration::from_secs(1);
 const RATELIMIT_REQUESTS_BURST: u64 = 30;
 const RATELIMIT_DURATION_BURST: Duration = Duration::from_secs(60);
 
+type ClientStack =
+    RateLimitWithBurst<AddAuthorization<ExtraHeaders<BaseUrl<InnerClient<Full<Bytes>>>>>>;
+
 #[derive(Debug)]
-struct WrappedClient(RateLimitWithBurst<AddAuthorization<BaseUrl<InnerClient<Full<Bytes>>>>>);
+struct WrappedClient(ClientStack);
 
 impl WrappedClient {
     async fn new(base_url: &str) -> Result<Self, anyhow::Error> {
@@ -54,11 +59,19 @@ impl WrappedClient {
             .map_err(|err| event!(Level::ERROR, %err, "SPACETRADERS_TOKEN not found"))
             .unwrap();
         let auth = AddAuthorizationLayer::bearer(&token).as_sensitive(true);
+        let headers = Arc::new(vec![(
+            header::USER_AGENT,
+            "catfleet/0.1.0"
+                .try_into()
+                .expect("Should be valid header value"),
+        )]);
+        let extra_headers = ExtraHeadersLayer::new(headers);
         let base_url = BaseUrlLayer::new(base_url);
 
         let service = ServiceBuilder::new()
             .layer(rate_limit)
             .layer(auth)
+            .layer(extra_headers)
             .layer(base_url)
             .service(client);
 
@@ -67,7 +80,7 @@ impl WrappedClient {
 }
 
 impl Deref for WrappedClient {
-    type Target = RateLimitWithBurst<AddAuthorization<BaseUrl<InnerClient<Full<Bytes>>>>>;
+    type Target = ClientStack;
 
     fn deref(&self) -> &Self::Target {
         &self.0
