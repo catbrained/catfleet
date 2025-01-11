@@ -26,6 +26,7 @@ use crate::model::{
 use inner::InnerClient;
 use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
 
+mod base_url;
 pub mod inner;
 mod limit;
 
