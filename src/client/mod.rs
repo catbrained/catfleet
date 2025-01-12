@@ -30,7 +30,7 @@ use middleware::{
     RateLimitWithBurstLayer,
 };
 
-pub mod inner;
+mod inner;
 mod middleware;
 
 const RATELIMIT_REQUESTS_DEFAULT: u64 = 2;
