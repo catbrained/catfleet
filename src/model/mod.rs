@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /// The activity level of a trade good.
 /// If the good is an import, this represents how strong consumption is.
@@ -1666,7 +1667,7 @@ impl Display for WaypointType {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiStatus {
     pub status: String,
@@ -1680,7 +1681,7 @@ pub struct ApiStatus {
     pub links: Vec<Link>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct GameStats {
     pub agents: u64,
@@ -1689,42 +1690,42 @@ pub struct GameStats {
     pub waypoints: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Leaderboards {
     pub most_credits: Vec<LeaderboardAgentCredits>,
     pub most_submitted_charts: Vec<LeaderboardAgentCharts>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct LeaderboardAgentCredits {
     pub agent_symbol: String,
     pub credits: i64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct LeaderboardAgentCharts {
     pub agent_symbol: String,
     pub chart_count: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ServerResets {
     pub next: String,
     pub frequency: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Announcement {
     pub title: String,
     pub body: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Link {
     pub name: String,
