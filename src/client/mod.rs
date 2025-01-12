@@ -24,15 +24,14 @@ use crate::model::{
     ShipyardTransaction, Siphon, Survey, System, TradeGoodAmount, TradeSymbol, Waypoint,
     WaypointTraitSymbol, WaypointType,
 };
-use base_url::{BaseUrl, BaseUrlLayer};
-use extra_headers::{ExtraHeaders, ExtraHeadersLayer};
 use inner::InnerClient;
-use limit::{RateLimitWithBurst, RateLimitWithBurstLayer};
+use middleware::{
+    BaseUrl, BaseUrlLayer, ExtraHeaders, ExtraHeadersLayer, RateLimitWithBurst,
+    RateLimitWithBurstLayer,
+};
 
-mod base_url;
-mod extra_headers;
 pub mod inner;
-mod limit;
+mod middleware;
 
 const RATELIMIT_REQUESTS_DEFAULT: u64 = 2;
 const RATELIMIT_DURATION_DEFAULT: Duration = Duration::from_secs(1);
