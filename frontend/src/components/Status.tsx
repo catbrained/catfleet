@@ -1,71 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
-
-const BASE_URL = "http://localhost:5173";
-
-interface Status {
-  status: string;
-  version: string;
-  resetDate: string;
-  description: string;
-  stats: Stats;
-  leaderboards: Leaderboards;
-  serverResets: ServerResets;
-  announcements: Announcement[];
-  links: Link[];
-}
-
-interface Link {
-  name: string;
-  url: string;
-}
-
-interface Announcement {
-  title: string;
-  body: string;
-}
-
-interface ServerResets {
-  next: string;
-  frequency: string;
-}
-
-interface Stats {
-  agents: number;
-  ships: number;
-  systems: number;
-  waypoints: number;
-}
-
-interface Leaderboards {
-  mostCredits: AgentCredits[];
-  mostSubmittedCharts: AgentCharts[];
-}
-
-interface AgentCredits {
-  agentSymbol: string;
-  credits: number;
-}
-
-interface AgentCharts {
-  agentSymbol: string;
-  chartCount: number;
-}
+import { useQueryClient } from "@tanstack/react-query";
+import { $api } from "../api.ts";
 
 function Status() {
-  const fetchStatus = async (): Promise<Status> => {
-    const response = await fetch(`${BASE_URL}/status`);
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-    return response.json();
-  };
-
-  const { isPending, isError, isFetching, data, error } = useQuery({
-    queryKey: ["status"],
-    queryFn: fetchStatus,
-    staleTime: 1000 * 10,
-    refetchInterval: 1000 * 15,
-  });
+  const queryClient = useQueryClient();
+  const { isPending, isError, isFetching, data, error } = $api.useQuery(
+    "get",
+    "/status",
+    {},
+    {
+      staleTime: 1000 * 10,
+      refetchInterval: 1000 * 15,
+    },
+    queryClient,
+  );
 
   if (isPending) {
     return <span>Loading...</span>;
@@ -74,7 +21,7 @@ function Status() {
   if (isError) {
     return (
       <span>
-        Something went wrong! Please try again. (Error message: {error.message})
+        Something went wrong! Please try again. (Error message: {error})
       </span>
     );
   }
